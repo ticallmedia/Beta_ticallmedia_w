@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from translations import get_message
 import openai
-from prompt_ia import get_message
+#from prompt_ia import get_message
 from io import StringIO # Importar StringIO para el manejo de credenciales
 import threading
 
