@@ -249,7 +249,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     if mensaje_procesado == "hi" or mensaje_procesado == "hola" or mensaje_procesado or "start":
         user_language = "es"
-        send_initial_messages(telefono_id, user_language)
+        #send_initial_messages(telefono_id, user_language)
+        send_ia_message(telefono_id, mensaje_procesado)
     else:
         send_ia_message(telefono_id, mensaje_procesado)
 
