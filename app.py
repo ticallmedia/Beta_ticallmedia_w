@@ -5,9 +5,8 @@ import http.client
 import logging
 import os
 from dotenv import load_dotenv
-from translations import get_message
 import openai
-#from prompt_ia import get_message
+from prompt_ia import get_message
 from io import StringIO # Importar StringIO para el manejo de credenciales
 import threading
 
@@ -120,14 +119,20 @@ def send_whatsapp_message(data):
         connection.close()
 
 
-"""
-def send_ia_message(data):
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-    mensaje_usuario = data
 
-    if mensaje_usuario.lower() in ["salir", "exit", "quit"]:
-        print("👋 ¡Gracias por contactarnos! Hasta pronto.")
-        break
+def send_ia_message(telefono_id, message_text):
+
+    openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+    message_prompt = get_message("es", "prompt")
+
+    chat_history = [{"role": "system", "content": message_prompt}]
+
+    mensaje_usuario = message_text
+
+    #if mensaje_usuario.lower() in ["salir", "exit", "quit"]:
+     #   print("👋 ¡Gracias por contactarnos! Hasta pronto.")
+      #  break
 
     # Agregar el mensaje del usuario al historial
     chat_history.append({"role": "user", "content": mensaje_usuario})
@@ -140,12 +145,23 @@ def send_ia_message(data):
 
     # Obtener la respuesta del asistente
     respuesta_bot = response['choices'][0]['message']['content']
-    print(f"Asistente: {respuesta_bot}\n")
+    #print(f"Asistente: {respuesta_bot}\n")
 
     # Agregar respuesta del bot al historial
     chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-    """
+    data = {
+        'telefono_usuario_id': telefono_id,
+        'plataforma': 'whatsapp 📞📱💬',
+        'mensaje': respuesta_bot, # El texto del mensaje que se envía
+        'estado_usuario': 'enviado',
+        'etiqueta_campana': 'Respuesta Bot',
+        'agente': AGENTE_BOT
+    }
+    
+    send_whatsapp_message(data)
+
+   
 #_______________________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
 TOKEN_CODE = os.getenv('META_WHATSAPP_TOKEN_CODE')
@@ -226,10 +242,13 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     }
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
-    threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
+    #threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    user_language = "es"
-    send_initial_messages(telefono_id, user_language)
+    if mensaje_procesado == "hi" or mensaje_procesado == "hola" or mensaje_procesado or "stars":
+        user_language = "es"
+        send_initial_messages(telefono_id, user_language)
+    else:
+        send_ia_message(telefono_id, mensaje_recibido)
 
 
 
