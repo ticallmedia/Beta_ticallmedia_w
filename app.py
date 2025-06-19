@@ -6,6 +6,8 @@ import logging
 import os
 from dotenv import load_dotenv
 from translations import get_message
+import openai
+from prompt_ia import get_message
 from io import StringIO # Importar StringIO para el manejo de credenciales
 import threading
 
@@ -117,6 +119,33 @@ def send_whatsapp_message(data):
     finally:
         connection.close()
 
+
+"""
+def send_ia_message(data):
+    openai.api_key = os.environ.get("OPENAI_API_KEY")
+    mensaje_usuario = data
+
+    if mensaje_usuario.lower() in ["salir", "exit", "quit"]:
+        print("👋 ¡Gracias por contactarnos! Hasta pronto.")
+        break
+
+    # Agregar el mensaje del usuario al historial
+    chat_history.append({"role": "user", "content": mensaje_usuario})
+
+    # Solicitar respuesta a OpenAI
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=chat_history
+    )
+
+    # Obtener la respuesta del asistente
+    respuesta_bot = response['choices'][0]['message']['content']
+    print(f"Asistente: {respuesta_bot}\n")
+
+    # Agregar respuesta del bot al historial
+    chat_history.append({"role": "assistant", "content": respuesta_bot})
+
+    """
 #_______________________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
 TOKEN_CODE = os.getenv('META_WHATSAPP_TOKEN_CODE')
@@ -166,6 +195,9 @@ def recibir_mensajes(req):
                 mensaje_texto = message.get('text', {}).get('body')
 
             if telefono_id and mensaje_texto:
+
+                chat_history = [{"role": "system", "content": mensaje_texto}]    
+
                 procesar_y_responder_mensaje(telefono_id, mensaje_texto)
             else:
                 logging.info("Mensaje no procesable (sin ID de teléfono o texto de mensaje).")
@@ -198,31 +230,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    # Lógica para seleccionar idioma
-    if mensaje_procesado =="hola" or mensaje_procesado =="hi" or mensaje_procesado =="start" :
-        user_language = "es"
-        send_initial_messages(telefono_id, user_language)
-    elif mensaje_procesado == "btn_si1":
-        user_language = "es"
-        question1_messages(telefono_id, user_language)
-    elif mensaje_procesado == "btn_no1":
-        user_language = "es"
-        request1_messages(telefono_id, user_language)
-    elif mensaje_procesado in map(str, range(0, 10)):
-        user_language = "es"
-        request2_messages(telefono_id, user_language)
-    elif mensaje_procesado == "btn_si2":
-        user_language = "es"
-        request2_messages(telefono_id, user_language)
-    elif mensaje_procesado == "btn_no2":
-        user_language = "es"
-        request1_messages(telefono_id, user_language)
-    elif mensaje_procesado == "btn_no3":
-        user_language = "es"
-        despedida_messages(telefono_id, user_language)
-    else: # Si no tiene idioma, pedirle que lo seleccione
-        user_language = "es"
-        send_initial_messages(telefono_id, user_language)
+    user_language = "es"
+    send_initial_messages(telefono_id, user_language)
 
 
 
@@ -260,97 +269,6 @@ def send_initial_messages(telefono_id, lang):
     )
 
 
-def question1_messages(telefono_id, lang):
-    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
-    # Saludo en el idioma elegido
-    message_response = get_message(lang, "job")
-    send_message_and_log(telefono_id, message_response, 'text')
-
-    # Imagen
-    #message_response = get_message(lang, "advice1") 
-    #send_message_and_log(telefono_id, message_response, 'text')
-
-    #Botones pregunta1
-    # Definimos los títulos de los botones según el idioma
-    if lang == "es":
-        si_title = "Si"
-        no_title = "Tal vez"
-    else:
-        si_title = "Yes"
-        no_title = "Maybe"
-    
-    # Definimos los IDs de los botones (estos no cambian con el idioma)
-    si_id = "btn_si2"
-    no_id = "btn_no2"
-
-    message_response_for_buttons = get_message(lang, "advice1")
-    
-    send_message_and_log(
-        telefono_id, 
-        message_response_for_buttons, 
-        'button', 
-        button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
-        button_ids=[si_id, no_id]           # Pasamos los IDs fijos
-    )
-
-def request1_messages(telefono_id, lang):
-    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
-    # Saludo en el idioma elegido
-    message_response = get_message(lang, "portfolio")
-    send_message_and_log(telefono_id, message_response, 'text')
-    
-    
-def request2_messages(telefono_id, lang):
-    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
-    # Saludo en el idioma elegido
-    message_response = get_message(lang, "schedule")
-    send_message_and_log(telefono_id, message_response, 'text')
-
-    # Imagen
-    message_response = get_message(lang, "calendar") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'text')
-
-    #Botones pregunta1
-    # Definimos los títulos de los botones según el idioma
-    if lang == "es":
-        si_title = "Hablar con un Agente"
-        no_title = "Finalizar chat"
-    else:
-        si_title = "Talk to an Agent"
-        no_title = "End Chat"
-    
-    # Definimos los IDs de los botones (estos no cambian con el idioma)
-    si_id = "btn_si3"
-    no_id = "btn_no3"
-
-    message_response_for_buttons = get_message(lang, "default_response")
-    
-    send_message_and_log(
-        telefono_id, 
-        message_response_for_buttons, 
-        'button', 
-        button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
-        button_ids=[si_id, no_id]           # Pasamos los IDs fijos
-    )
-
-def despedida_messages(telefono_id, lang):
-    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
-    # Saludo en el idioma elegido
-    message_response = get_message(lang, "farewell")
-    send_message_and_log(telefono_id, message_response, 'text')
-
-def enviar_respuesta_interactiva(telefono_id, mensaje_procesado, user_language):
-
-    """Gestiona las respuestas interactivas basadas en los botones Si/No."""
-    message_response = ""
-    if mensaje_procesado == "btn_si1":
-        message_response = get_message(user_language, "job")
-    elif mensaje_procesado == "btn_no1":
-        message_response = get_message(user_language, "advice")
-    else: # Cualquier otro mensaje de texto cuando el idioma ya está establecido
-        message_response = get_message(user_language, "default_response")
-    
-    send_message_and_log(telefono_id, message_response, 'text')
 
 
 def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None):
