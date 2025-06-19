@@ -224,8 +224,6 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         'etiqueta_campana': 'Vacaciones',
         'agente': AGENTE_BOT
     }
-    #agregar_mensajes_log(json.dumps(log_data_in))
-    #exportar_eventos() # Exportar después de cada registro de mensaje
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
