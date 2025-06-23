@@ -22,7 +22,6 @@ Caracteristicas:
 - AI gpt-3.5-turbo inicialmente, en python con openai==0.28.1
 - En gitgnore, se agrega el archivo .env
 
-
 """
 #_______________________________________________________________________________________
 app = Flask(__name__)
