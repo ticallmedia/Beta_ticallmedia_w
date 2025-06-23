@@ -247,9 +247,20 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         request1_messages(telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1":
         user_language = "es"
-        prompt_ia = "prompt_ia_no"
-        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)     
+        request1_messages(telefono_id, user_language)      
     elif mensaje_procesado == "1":
+        user_language = "es"
+        prompt_ia = "prompt_ia_yes"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
+    elif mensaje_procesado == "2":
+        user_language = "es"
+        prompt_ia = "prompt_ia_yes"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
+    elif mensaje_procesado == "3":
+        user_language = "es"
+        prompt_ia = "prompt_ia_yes"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
+    elif mensaje_procesado == "0" or mensaje_procesado == "asesor":
         user_language = "es"
         prompt_ia = "prompt_ia_yes"
         send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
