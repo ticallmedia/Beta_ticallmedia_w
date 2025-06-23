@@ -152,16 +152,7 @@ def send_ia_message(telefono_id, message_text):
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        message_response = {
-            'telefono_usuario_id': telefono_id,
-            'plataforma': 'whatsapp 📞📱💬',
-            'mensaje': respuesta_bot, # El texto del mensaje que se envía
-            'estado_usuario': 'enviado',
-            'etiqueta_campana': 'Respuesta Bot',
-            'agente': AGENTE_BOT
-        }
-
-        send_message_and_log(telefono_id, message_response, 'text')
+        send_message_and_log(telefono_id, respuesta_bot, 'text')
 
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
