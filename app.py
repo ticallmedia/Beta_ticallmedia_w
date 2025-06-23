@@ -121,12 +121,10 @@ def send_whatsapp_message(data):
 
 
 
-def send_ia_message(telefono_id, message_text, prompt_ia):
+def send_ia_message(telefono_id, message_text, prompt):
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-    prompt = prompt_ia
-
+    
     try:
         message_prompt = get_message("es", prompt)
 
