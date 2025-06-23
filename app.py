@@ -239,7 +239,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    if mensaje_procesado == "hi" or mensaje_procesado == "hola" or mensaje_procesado or "start":
+    if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "start":
         user_language = "es"
         send_initial_messages(telefono_id, user_language)        
     elif mensaje_procesado == "btn_si1":
@@ -296,7 +296,7 @@ def send_initial_messages(telefono_id, lang):
 def request1_messages(telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
     # Saludo en el idioma elegido
-    message_response = get_message(lang, "portfolio")
+    message_response = get_message(lang, "portafolio")
     send_message_and_log(telefono_id, message_response, 'text')
     
 

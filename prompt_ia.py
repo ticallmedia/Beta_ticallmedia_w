@@ -3,7 +3,7 @@ MESSAGES = {
         "welcome_initial": "👋😊!Hola¡ Bienvenido a TicAll Media.",
         "greeting_text1": "¡Saludos! 🤖 ¿Intrigado por una estrategia de marketing más inteligente?",
         "greeting_text2": "En TicAll Media, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
-        "portfolio": "🚀 Hola, ¿buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
+        "portafolio": "🚀 Hola, ¿buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
         "prompt_ia_yes": (
             "Eres un asistente virtual de TicAll Media, alegre, positivo, utilizas muchos emoticones. "
             "Tu tarea es ayudar a nuevos usuarios a solicitar alguno de los servicios digitales que ofrece la agencia. "
@@ -36,7 +36,7 @@ MESSAGES = {
         "welcome_initial": "👋😊!Hi there! Welcome to TicAll Media.",
         "greeting_text1": "Greetings! 🤖 Intrigued by a smarter marketing strategy?",
         "greeting_text2": "At TicAll Media, we have ideas that might surprise you.\n\nReady to explore?",
-        "portfolio": "🚀 Hi, are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
+        "portafolio": "🚀 Hi, are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
         "prompt_ia_yes": (
             "You are a virtual assistant at TicAll Media. You are cheerful, positive, and use a lot of emoticons. "
             "Your job is to help new users request one of the digital services the agency offers. "
