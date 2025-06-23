@@ -247,8 +247,9 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         request1_messages(telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1":
         user_language = "es"
-        request1_messages(telefono_id, user_language)      
-    elif 0 <= mensaje_procesado <= 9:
+        prompt_ia = "prompt_ia_yes"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)     
+    elif mensaje_procesado == "1":
         user_language = "es"
         prompt_ia = "prompt_ia_yes"
         send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
