@@ -121,12 +121,14 @@ def send_whatsapp_message(data):
 
 
 
-def send_ia_message(telefono_id, message_text):
+def send_ia_message(telefono_id, message_text, prompt_ia):
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
+    prompt = prompt_ia
+
     try:
-        message_prompt = get_message("es", "prompt")
+        message_prompt = get_message("es", prompt)
 
         chat_history = [{"role": "system", "content": message_prompt}]
 
@@ -241,11 +243,21 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     if mensaje_procesado == "hi" or mensaje_procesado == "hola" or mensaje_procesado or "start":
         user_language = "es"
-        #send_initial_messages(telefono_id, user_language)
-        
-        send_ia_message(telefono_id, mensaje_procesado)
+        send_initial_messages(telefono_id, user_language)        
+    elif mensaje_procesado == "btn_si1":
+        user_language = "es"
+        request1_messages(telefono_id, user_language)  
+    elif mensaje_procesado == "btn_no2":
+        user_language = "es"
+        request1_messages(telefono_id, user_language)      
+    elif 0 <= mensaje_procesado <= 9:
+        user_language = "es"
+        prompt_ia = "prompt_ia_yes"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
     else:
-        send_ia_message(telefono_id, mensaje_procesado)
+        user_language = "es"
+        prompt_ia = "prompt_ia_no"
+        send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
 
 
 
@@ -283,7 +295,12 @@ def send_initial_messages(telefono_id, lang):
     )
 
 
-
+def request1_messages(telefono_id, lang):
+    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
+    # Saludo en el idioma elegido
+    message_response = get_message(lang, "portfolio")
+    send_message_and_log(telefono_id, message_response, 'text')
+    
 
 def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None):
     """
