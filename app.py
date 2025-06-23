@@ -254,7 +254,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
     else:
         user_language = "es"
-        prompt_ia = "prompt_ia_no"
+        prompt_ia = "prompt_ia_yes"
         send_ia_message(telefono_id, mensaje_procesado,prompt_ia)
 
 
