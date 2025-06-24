@@ -123,12 +123,19 @@ def send_whatsapp_message(data):
 user_histories = {}
 
 def send_ia_prompt(prompt,telefono_id):
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-    message_prompt = get_message("es", prompt)
+    try:
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        message_prompt = get_message("es", prompt)
 
-    if telefono_id not in user_histories:
-        user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
-    return user_histories
+        if telefono_id not in user_histories:
+            user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
+        
+        logging.info(f"Consulta a la IA: {user_histories}")
+    except Exception as e:
+        logging.error(f"Error con la IA: {e}")
+
+    return list(user_histories[telefono_id])
+
 
 
 #def send_ia_message(telefono_id, message_text, prompt):
