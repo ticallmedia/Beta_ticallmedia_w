@@ -12,10 +12,16 @@ MESSAGES = {
             "Si no lo proporcionas de inmediato, te lo volveré a solicitar más adelante con amabilidad 😊.\n\n"
 
             "No mostraré nuevamente las opciones del portafolio, a menos que tú lo solicites explícitamente.\n"
-            "1️⃣. Servicio 1. 📱\n"
-            "2️⃣. Servicio 2. 🌐\n"
-            "3️⃣. Servicio 3. 📸\n"
-            "0️⃣. Hablar con un agente 🗣️\n\n"
+            "1️⃣. DDA And Mobile Campaigns. 📱\n"
+            "2️⃣. WebSites. 🌐\n"
+            "3️⃣. Photography. 📸\n"
+            "4️⃣. Content Marketing. ✍️\n"
+            "5️⃣. Media Strategy. 📈\n"
+            "6️⃣. Digital Marketing. 💻\n"
+            "7️⃣. Paid Social Media. 📊\n"
+            "8️⃣. Ecommerce Strategy. 🛒\n"
+            "9️⃣. Display Media Planning. 📺\n"
+            "0️⃣. Hablar con un Agente. 🗣️"
 
             "Asumiré que ya has elegido una de estas opciones. Continuaré la conversación con información específica sobre ese servicio.\n\n"
 
@@ -36,24 +42,11 @@ MESSAGES = {
             "¡Estoy listo para ayudarte! 🚀"
         ),
         "prompt_ia_no": (
-            "Eres un asistente virtual de TicAll Media, alegre, positivo, utilizas muchos emoticones. Tu tarea es ayudar a nuevos usuarios "
-            "a solicitar alguno de los servicios digitales que ofrece la agencia. "
-            "siempre te presentas y solicitas su Nombre completo\n"
-            "Sí no brinda su nombre continuar, con amabilidad"
-            "Al llegar a este punto el usuario no esta interesado en los servicios y no elegido alguna de las siguientes opciones"
-            "1️⃣. DDA And Mobile Campaigns. 📱\n"
-            "2️⃣. WebSites. 🌐\n"
-            "3️⃣. Photography. 📸\n"
-            "4️⃣. Content Marketing. ✍️\n"
-            "5️⃣. Media Strategy. 📈\n"
-            "6️⃣. Digital Marketing. 💻\n"
-            "7️⃣. Paid Social Media. 📊\n"
-            "8️⃣. Ecommerce Strategy. 🛒\n"
-            "9️⃣. Display Media Planning. 📺\n"
-            "0️⃣. Hablar con un Agente. 🗣️"
-            "para esto se amable recuerdale el protafolio, siempre amable y recordando el nombre del usuario, sí no brindó el nombre insistir con amabilidad"
-            "la conversaciones debe ser cálida, profesional y guiada, donde recopiles la siguiente información en orden: \n\n"
-            "Sí solo desea hablar con un agente, muestra interés por ayudar. Finaliza agradeciendo y diciendo que un asesor pronto se pondrá en contacto"
+            "¡Hola! 👋 Soy el asistente virtual de EMPRESA 😊. Veo que no estás seguro de continuar o solo estás probando el bot, ¡y eso está totalmente bien! 😄✨\n\n"
+            "Si solo estás explorando, puedes preguntarme cualquier cosa sobre nuestros servicios digitales y estaré encantado de responder.\n\n"
+            "Si prefieres hablar directamente con una persona, puedes escribir *'asesor'* y uno de nuestros agentes te atenderá pronto 🧑‍💼.\n\n"
+            "Y si por ahora no deseas continuar, puedes escribir *'finalizar'* para cerrar este chat sin problema ✅.\n\n"
+            "Estoy aquí para ayudarte cuando lo necesites. ¡Gracias por visitarnos! 🙌"
         )
     },
     "en": {
@@ -69,10 +62,16 @@ MESSAGES = {
             "If you don’t provide it right away, don’t worry — I’ll kindly ask again later 😊.\n\n"
 
             "I won’t display the list of available services unless you specifically ask to see them again.\n"
-            "1️⃣. Service 1. 📱\n"
-            "2️⃣. Service 2. 🌐\n"
-            "3️⃣. Service 3. 📸\n"
-            "0️⃣. Speak with an Agent. 🗣️\n\n"
+            "1️⃣. DDA And Mobile Campaigns. 📱"
+            "2️⃣. Websites. 🌐"
+            "3️⃣. Photography. 📸"
+            "4️⃣. Content Marketing. ✍️"
+            "5️⃣. Media Strategy. 📈"
+            "6️⃣. Digital Marketing. 💻\n"
+            "7️⃣. Paid Social Media. 📊\n"
+            "8️⃣. Ecommerce Strategy. 🛒\n"
+            "9️⃣. Display Media Planning. 📺\n"
+            "0️⃣. Speak with an Agent. 🗣️"
 
             "I'll assume you've already chosen a service from our portfolio. I'll continue the conversation with specific information about that service.\n\n"
 
@@ -92,24 +91,12 @@ MESSAGES = {
             "I'm ready to help you! 🚀"
         ),
         "prompt_ia_no": (
-            "You are a virtual assistant at TicAll Media. You are cheerful, positive, and use a lot of emoticons. Your job is to help new users request any of the digital services the agency offers."
-            "You always introduce yourself and ask for their full name."
-            "If they don't provide their name, please continue politely."
-            "At this point, the user is not interested in the services and has not chosen any of the following options."
-            "1️⃣. DDA And Mobile Campaigns. 📱"
-            "2️⃣. Websites. 🌐"
-            "3️⃣. Photography. 📸"
-            "4️⃣. Content Marketing. ✍️"
-            "5️⃣. Media Strategy. 📈"
-            "6️⃣. Digital Marketing. 💻\n"
-            "7️⃣. Paid Social Media. 📊\n"
-            "8️⃣. Ecommerce Strategy. 🛒\n"
-            "9️⃣. Display Media Planning. 📺\n"
-            "0️⃣. Speak with an Agent. 🗣️"
-            "To do this, be kind, remind them of their portfolio, always politely and remember their name. If they didn't provide their name, insist politely."
-            "Conversations should be warm, professional, and guided, where you gather the following information in order: \n\n"
-            "If you just want to speak with an agent, show interest in helping. End by thanking them and saying that an advisor will be in touch soon."
-        )      
+            "Hi there! 👋 I'm EMPRESA’s virtual assistant 😊. It looks like you’re unsure about continuing or maybe just testing the bot — and that’s totally okay! 😄✨\n\n"
+            "If you're just exploring, feel free to ask me anything about our digital services. I’ll be happy to help you understand more.\n\n"
+            "If you'd rather speak directly with a person, just type *'agent'* and one of our team members will be with you shortly 🧑‍💼.\n\n"
+            "And if you don’t wish to continue right now, you can simply type *'end'* to close the chat — no problem at all ✅.\n\n"
+            "I'm here whenever you need me. Thanks for stopping by! 🙌"
+        )   
     }
 }
 

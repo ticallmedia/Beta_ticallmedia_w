@@ -120,14 +120,19 @@ def send_whatsapp_message(data):
         connection.close()
 
 
+user_histories = {}
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-message_prompt = get_message("es", "prompt_ia_yes")
-chat_history = [{"role": "system", "content": message_prompt}]
+def send_ia_prompt(prompt,telefono_id):
+    openai.api_key = os.environ.get("OPENAI_API_KEY")
+    message_prompt = get_message("es", prompt)
+
+    if telefono_id not in user_histories:
+        user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
+    return user_histories
 
 
 #def send_ia_message(telefono_id, message_text, prompt):
-def send_ia_message(telefono_id, message_text):
+def send_ia_message(telefono_id, message_text, chat_history):
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     
@@ -245,27 +250,24 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         request1_messages(telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1":
         user_language = "es"
-        request1_messages(telefono_id, user_language)      
-    elif mensaje_procesado == "1":
+        chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history)
+    elif mensaje_procesado in ["1", "2", "3","4", "5","6","7","8","9"]:
         user_language = "es"
-        #prompt_ia = "prompt_ia_yes"
-        send_ia_message(telefono_id, mensaje_procesado)
-    elif mensaje_procesado == "2":
-        user_language = "es"
-        #prompt_ia = "prompt_ia_yes"
-        send_ia_message(telefono_id, mensaje_procesado)
-    elif mensaje_procesado == "3":
-        user_language = "es"
-        #prompt_ia = "prompt_ia_yes"
-        send_ia_message(telefono_id, mensaje_procesado)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history)
     elif mensaje_procesado == "0" or mensaje_procesado == "asesor":
         user_language = "es"
-        #prompt_ia = "prompt_ia_yes"
-        send_ia_message(telefono_id, mensaje_procesado)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history)
+    elif mensaje_procesado  in ["salir", "exit", "quit"]:
+        user_language = "es"
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history)
     else:
         user_language = "es"
-        #prompt_ia = "prompt_ia_yes"
-        send_ia_message(telefono_id, mensaje_procesado)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history)
 
 
 
