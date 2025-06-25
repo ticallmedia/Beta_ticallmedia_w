@@ -217,6 +217,8 @@ def recibir_mensajes(req):
                 interactive_type = message.get('interactive', {}).get('type')
                 if interactive_type == "button_reply":
                     mensaje_texto = message.get('interactive', {}).get('button_reply', {}).get('id')
+                elif interactive_type == "list_reply":
+                    mensaje_texto = message.get('interactive', {}).get('list_reply', {}).get('id')
             elif tipo_mensaje == 'text':
                 mensaje_texto = message.get('text', {}).get('body')
 
