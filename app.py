@@ -21,12 +21,14 @@ Caracteristicas:
 
 - AI gpt-3.5-turbo inicialmente, en python con openai==0.28.1
 - En gitgnore, se agrega el archivo .env
+- Las credenciales se suben en render directamente
+
 
 """
 #_______________________________________________________________________________________
 app = Flask(__name__)
 
-# Configura el logger (útil para depurar en Render)
+# Configura el logger (Log de eventos para ajustado para utilizarlo en render)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Configuración de base de datos SQLITE
@@ -119,6 +121,8 @@ def send_whatsapp_message(data):
     finally:
         connection.close()
 
+""""Función para cargar o actualizar prompt de la IA, y mantener el hilo de
+conversación con un usuario"""
 
 user_histories = {}
 
@@ -136,9 +140,7 @@ def send_ia_prompt(prompt,telefono_id):
 
     return list(user_histories[telefono_id])
 
-
-
-#def send_ia_message(telefono_id, message_text, prompt):
+"""Función que mantenie el flujo de la conversación de la IA"""
 def send_ia_message(telefono_id, message_text, chat_history):
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -255,7 +257,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     elif mensaje_procesado == "btn_si1":
         user_language = "es"
         request1_messages(telefono_id, user_language)  
-    elif mensaje_procesado == "btn_no1":
+    elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
@@ -265,8 +267,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
     elif mensaje_procesado == "0" or mensaje_procesado == "asesor":
         user_language = "es"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history)
+        request1_messages(telefono_id, user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
@@ -312,14 +313,43 @@ def send_initial_messages(telefono_id, lang):
     )
 
 
-def request1_messages(telefono_id, lang):
-    """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
-    # Saludo en el idioma elegido
-    message_response = get_message(lang, "portafolio")
-    send_message_and_log(telefono_id, message_response, 'text')
-    
+#def request1_messages(telefono_id, lang):
+    """El usuario esta interesado y desea conocer mas del tema"""
+ #   message_response = get_message(lang, "portafolio")
+  #  send_message_and_log(telefono_id, message_response, 'text')
 
-def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None):
+def request1_messages(telefono_id, lang):
+    """El usuario esta interesado y desea conocer mas del tema"""
+
+    if lang == "es":
+        title_1 = ". DDA And Mobile Campaigns. 📱"
+        title_2 = ". WebSites. 🌐"
+    else:
+        title_1 = ". DDA And Mobile Campaigns. 📱"
+        title_2 = ". WebSites. 🌐"
+    
+    # Definimos los IDs de los botones (estos no cambian con el idioma)
+    id_1 = "btn_1"
+    id_2 = "btn_2"
+
+    message_response_for_list = get_message(lang, "portafolio")
+    
+    send_message_and_log(
+        telefono_id, 
+        message_response_for_list, 
+        'list', 
+        list_titles=[title_1, title_2], # Pasamos los títulos que varían por idioma
+        list_ids=[id_1, id_2],           # Pasamos los IDs fijos
+        list_descrip=["1","2"] #pasan las descripciones de cada opcion 
+    )
+
+def send_adviser_messages(telefono_id, lang):
+    """El usuario esta interesado y quiere concretar una cita"""
+    message_response = get_message(lang, "agent")
+    send_message_and_log(telefono_id, message_response, 'text')
+
+
+def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -370,6 +400,35 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
                 "action": {"buttons": buttons}
             }
         }
+    
+    elif message_type == 'list' and list_titles and list_ids and list_descrip and len(list_titles) == len(list_ids) == len(list_descrip):
+        
+        lista = []
+        
+        for i in range(len(list_titles)):
+            lista.append(
+                {"id": list_ids[i], "title": list_titles[i], "description": list_descrip[i]}
+            )
+        
+        sections = [{"title": "Portafolio TicAll Media",
+        "rows": [lista]}]
+
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": telefono_id,
+            "type": "interactive",
+            "interactive": {
+                "type": "list",
+                "body": {"text": message_text},
+                "footer": {"text": "Elige una de las opciones para poder ayudarte:"},
+                "action": {"button": "Ver Portafolio",
+                           "sections": sections
+                           }
+            }
+        }
+
+
     else:
         logging.warning(f"Tipo de mensaje no soportado o parámetros incompletos: {message_type}")
         return # No procesar si el tipo es incorrecto o faltan parámetros

@@ -3,9 +3,11 @@ MESSAGES = {
         "welcome_initial": "👋😊!Hola¡ Bienvenido a TicAll Media.",
         "greeting_text1": "¡Saludos! 🤖 ¿Intrigado por una estrategia de marketing más inteligente?",
         "greeting_text2": "En TicAll Media, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
-        "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
+        #"portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
+        "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Elige una opción ",
+        "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
         "prompt_ia_yes": (
-            "¡Hola! 👋 Soy el asistente virtual de EMPRESA 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
+            "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
             "Te atenderé con alegría, respeto y muchos emoticones para hacer esta experiencia más agradable 😄✨.\n\n"
 
             "Para comenzar, te pediré tu nombre completo para poder dirigirme a ti de forma más cercana. "
@@ -42,7 +44,7 @@ MESSAGES = {
             "¡Estoy listo para ayudarte! 🚀"
         ),
         "prompt_ia_no": (
-            "¡Hola! 👋 Soy el asistente virtual de EMPRESA 😊. Veo que no estás seguro de continuar o solo estás probando el bot, ¡y eso está totalmente bien! 😄✨\n\n"
+            "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Veo que no estás seguro de continuar o solo estás probando el bot, ¡y eso está totalmente bien! 😄✨\n\n"
             "Si solo estás explorando, puedes preguntarme cualquier cosa sobre nuestros servicios digitales y estaré encantado de responder.\n\n"
             "Si prefieres hablar directamente con una persona, puedes escribir *'asesor'* y uno de nuestros agentes te atenderá pronto 🧑‍💼.\n\n"
             "Y si por ahora no deseas continuar, puedes escribir *'finalizar'* para cerrar este chat sin problema ✅.\n\n"
@@ -53,9 +55,11 @@ MESSAGES = {
         "welcome_initial": "👋😊!Hi there! Welcome to TicAll Media.",
         "greeting_text1": "Greetings! 🤖 Intrigued by a smarter marketing strategy?",
         "greeting_text2": "At TicAll Media, we have ideas that might surprise you.\n\nReady to explore?",
-        "portafolio": "🚀 Are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
+        #"portafolio": "🚀 Are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
+        "portafolio": "🚀 Looking for advice on a special service?\n\n📌 Choose an option ",
+        "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
         "prompt_ia_yes_en": (
-            "Hi there! 👋 I'm EMPRESA’s virtual assistant 😊. I'm here to help you request any of our digital services. "
+            "Hi there! 👋 I'm TicAll Media virtual assistant 😊. I'm here to help you request any of our digital services. "
             "I'll assist you with a positive attitude, respect, and plenty of emojis to make our chat more enjoyable 😄✨.\n\n"
 
             "To start, I’ll ask for your full name so I can address you more personally. "
@@ -91,7 +95,7 @@ MESSAGES = {
             "I'm ready to help you! 🚀"
         ),
         "prompt_ia_no": (
-            "Hi there! 👋 I'm EMPRESA’s virtual assistant 😊. It looks like you’re unsure about continuing or maybe just testing the bot — and that’s totally okay! 😄✨\n\n"
+            "Hi there! 👋 I'm TicAll Media virtual assistant 😊. It looks like you’re unsure about continuing or maybe just testing the bot — and that’s totally okay! 😄✨\n\n"
             "If you're just exploring, feel free to ask me anything about our digital services. I’ll be happy to help you understand more.\n\n"
             "If you'd rather speak directly with a person, just type *'agent'* and one of our team members will be with you shortly 🧑‍💼.\n\n"
             "And if you don’t wish to continue right now, you can simply type *'end'* to close the chat — no problem at all ✅.\n\n"
