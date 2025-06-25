@@ -310,7 +310,7 @@ def send_initial_messages(telefono_id, lang):
     send_message_and_log(
         telefono_id, 
         message_response_for_buttons, 
-        message_type='button', 
+        'button', 
         button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
         button_ids=[si_id, no_id]           # Pasamos los IDs fijos
     )
@@ -324,25 +324,16 @@ def send_initial_messages(telefono_id, lang):
 def request1_messages(telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
     #titulos
-    list_titles = [". DDA And Mobile Campaigns. 📱",
-                   ". WebSites. 🌐"]
-    
-    # los IDs de los botones (estos no cambian con el idioma)
-    list_ids = ["btn_1",
-                "btn_2"]
-    
-    list_descrip=["1",
-                  "2"]
-    
+
     message_response_for_list = get_message(lang, "portafolio")
     
     send_message_and_log(
         telefono_id, 
         message_response_for_list, 
-        message_type='list', 
-        list_titles=list_titles, # Pasamos los títulos que varían por idioma
-        list_ids=list_ids,           # Pasamos los IDs fijos
-        list_descrip=list_descrip #pasan las descripciones de cada opcion 
+        'list', 
+        list_titles = [". DDA And Mobile Campaigns. 📱",". WebSites. 🌐"], # Pasamos los títulos que varían por idioma
+        list_ids = ["btn_1","btn_2"],           # Pasamos los IDs fijos
+        list_descrip=["1","2"] #pasan las descripciones de cada opcion 
     )
 
 def send_adviser_messages(telefono_id, lang):
