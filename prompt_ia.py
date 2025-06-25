@@ -5,6 +5,8 @@ MESSAGES = {
         "greeting_text2": "En TicAll Media, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
         #"portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
         "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Elige una opción ",
+        "list_footer_text":"Elige una de las opciones para poder ayudarte:",
+        "list_button_text": "Ver Portafolio",
         "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
         "prompt_ia_yes": (
             "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
@@ -57,6 +59,8 @@ MESSAGES = {
         "greeting_text2": "At TicAll Media, we have ideas that might surprise you.\n\nReady to explore?",
         #"portafolio": "🚀 Are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
         "portafolio": "🚀 Looking for advice on a special service?\n\n📌 Choose an option ",
+        "list_footer_text":"Please choose one of the options to help you:",
+        "list_button_text": "View Portfolio",
         "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
         "prompt_ia_yes_en": (
             "Hi there! 👋 I'm TicAll Media virtual assistant 😊. I'm here to help you request any of our digital services. "

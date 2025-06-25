@@ -105,6 +105,9 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
 def send_whatsapp_message(data):
     """Envía un mensaje a través de la API de WhatsApp Business."""
     data = json.dumps(data)
+
+    #se agrega la codificación utf-8 para que las listas pasen sin problema
+    encoded_data = data.encode('utf-8')
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {os.environ['META_WHATSAPP_ACCESS_TOKEN']}"
@@ -112,7 +115,7 @@ def send_whatsapp_message(data):
 
     connection = http.client.HTTPSConnection("graph.facebook.com")
     try:
-        connection.request("POST", f"/{os.environ['API_WHATSAPP_VERSION']}/{os.environ['META_WHATSAPP_PHONE_NUMBER_ID']}/messages", data, headers)
+        connection.request("POST", f"/{os.environ['API_WHATSAPP_VERSION']}/{os.environ['META_WHATSAPP_PHONE_NUMBER_ID']}/messages", encoded_data, headers)
         response = connection.getresponse()
         logging.info(f"Respuesta de WhatsApp API: {response.status} {response.reason}")
     except Exception as e:
