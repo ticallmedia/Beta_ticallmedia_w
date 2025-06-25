@@ -327,14 +327,51 @@ def request1_messages(telefono_id, lang):
 
     message_response_for_list = get_message(lang, "portafolio")
     
-    send_message_and_log(
-        telefono_id, 
-        message_response_for_list, 
-        'list', 
-        list_titles = [". DDA And Mobile Campaigns. 📱",". WebSites. 🌐"], # Pasamos los títulos que varían por idioma
-        list_ids = ["btn_1","btn_2"],           # Pasamos los IDs fijos
-        list_descrip=["1","2"] #pasan las descripciones de cada opcion 
-    )
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": telefono_id,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "body": {"text": "¿En qué podemos ayudarte?"},
+            "footer": {"text": "Selecciona una opción:"},
+            "action": {
+                "button": "Ver servicios",
+                "sections": [
+                    {
+                        "title": "Servicios disponibles",
+                        "rows": [
+                            {
+                                "id": "btn_1",
+                                "title": "Web 🌐",
+                                "description": "Desarrollo de sitios"
+                            },
+                            {
+                                "id": "btn_2",
+                                "title": "Ads 📱",
+                                "description": "Campañas en móviles"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+    log_data_out = {
+        'telefono_usuario_id': telefono_id,
+        'plataforma': 'whatsapp 📞📱💬',
+        'mensaje': message_response_for_list, # El texto del mensaje que se envía
+        'estado_usuario': 'enviado',
+        'etiqueta_campana': 'Respuesta Bot',
+        'agente': AGENTE_BOT
+    }
+    #agregar_mensajes_log(json.dumps(log_data_out))
+    #exportar_eventos()
+
+    threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_out),)).start()
+
+    send_whatsapp_message(data)
 
 def send_adviser_messages(telefono_id, lang):
     """El usuario esta interesado y quiere concretar una cita"""
