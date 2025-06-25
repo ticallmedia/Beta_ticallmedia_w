@@ -331,9 +331,9 @@ def request1_messages(telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = [". DDA And Mobile Campaigns. 📱",". WebSites. 🌐"], # Pasamos los títulos que varían por idioma
+        list_titles = [". Ads 📱.",". WebSites. 🌐"], # Pasamos los títulos que varían por idioma
         list_ids = ["btn_1","btn_2"],           # Pasamos los IDs fijos
-        list_descrip=["1","2"] #pasan las descripciones de cada opcion 
+        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios"] #pasan las descripciones de cada opcion 
     )
 
 def send_adviser_messages(telefono_id, lang):
