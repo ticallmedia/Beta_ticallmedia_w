@@ -261,7 +261,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
-    elif mensaje_procesado in ["1", "2", "3","4", "5","6","7","8","9","btn_1","btn_2"]:
+    elif mensaje_procesado in ["1","2","3","4","5","6","7","8","9","btn_1","btn_2"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
@@ -320,27 +320,26 @@ def send_initial_messages(telefono_id, lang):
 
 def request1_messages(telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
-
-    if lang == "es":
-        title_1 = ". DDA And Mobile Campaigns. 📱"
-        title_2 = ". WebSites. 🌐"
-    else:
-        title_1 = ". DDA And Mobile Campaigns. 📱"
-        title_2 = ". WebSites. 🌐"
+    #titulos
+    list_titles = [". DDA And Mobile Campaigns. 📱",
+                   ". WebSites. 🌐"]
     
-    # Definimos los IDs de los botones (estos no cambian con el idioma)
-    id_1 = "btn_1"
-    id_2 = "btn_2"
-
+    # los IDs de los botones (estos no cambian con el idioma)
+    list_ids = ["btn_1",
+                   "btn_2"]
+    
+    list_descrip=["1",
+                  "2"]
+    
     message_response_for_list = get_message(lang, "portafolio")
     
     send_message_and_log(
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles=[title_1, title_2], # Pasamos los títulos que varían por idioma
-        list_ids=[id_1, id_2],           # Pasamos los IDs fijos
-        list_descrip=["1","2"] #pasan las descripciones de cada opcion 
+        list_titles=list_titles, # Pasamos los títulos que varían por idioma
+        list_ids=list_ids,           # Pasamos los IDs fijos
+        list_descrip=list_descrip #pasan las descripciones de cada opcion 
     )
 
 def send_adviser_messages(telefono_id, lang):
@@ -401,17 +400,23 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
             }
         }
     
-    elif message_type == 'list' and list_titles and list_ids and list_descrip and len(list_titles) == len(list_ids) == len(list_descrip):
+    elif message_type == 'list' and list_titles and list_ids and list_descrip and len(list_titles) == len(list_ids) and len(list_ids) == len(list_descrip):
         
-        lista = []
+        lista_sections = []
         
         for i in range(len(list_titles)):
-            lista.append(
-                {"id": list_ids[i], "title": list_titles[i], "description": list_descrip[i]}
+            lista_sections.append(
+                {
+                    "id": list_ids[i], 
+                    "title": list_titles[i], 
+                    "description": list_descrip[i]
+                }
             )
         
-        sections = [{"title": "Portafolio TicAll Media",
-        "rows": [lista]}]
+        sections = [{
+            "title": "Portafolio TicAll Media",
+            "rows": lista_sections
+            }]
 
         data = {
             "messaging_product": "whatsapp",
@@ -422,9 +427,10 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
                 "type": "list",
                 "body": {"text": message_text},
                 "footer": {"text": "Elige una de las opciones para poder ayudarte:"},
-                "action": {"button": "Ver Portafolio",
-                           "sections": sections
-                           }
+                "action": {
+                    "button": "Ver Portafolio",
+                    "sections": sections
+                }
             }
         }
 
