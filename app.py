@@ -261,7 +261,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
-    elif mensaje_procesado in ["1", "2", "3","4", "5","6","7","8","9"]:
+    elif mensaje_procesado in ["1", "2", "3","4", "5","6","7","8","9","btn_1","btn_2"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history)
