@@ -310,7 +310,7 @@ def send_initial_messages(telefono_id, lang):
     send_message_and_log(
         telefono_id, 
         message_response_for_buttons, 
-        'button', 
+        message_type='button', 
         button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
         button_ids=[si_id, no_id]           # Pasamos los IDs fijos
     )
@@ -329,7 +329,7 @@ def request1_messages(telefono_id, lang):
     
     # los IDs de los botones (estos no cambian con el idioma)
     list_ids = ["btn_1",
-                   "btn_2"]
+                "btn_2"]
     
     list_descrip=["1",
                   "2"]
@@ -339,7 +339,7 @@ def request1_messages(telefono_id, lang):
     send_message_and_log(
         telefono_id, 
         message_response_for_list, 
-        'list', 
+        message_type='list', 
         list_titles=list_titles, # Pasamos los títulos que varían por idioma
         list_ids=list_ids,           # Pasamos los IDs fijos
         list_descrip=list_descrip #pasan las descripciones de cada opcion 
