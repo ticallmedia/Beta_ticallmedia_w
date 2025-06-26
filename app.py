@@ -290,12 +290,14 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         user_language = "es"
+        ESTADO_USUARIO = "calificado"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     else:
         user_language = "es"
+        #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
 
 
 
