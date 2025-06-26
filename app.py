@@ -22,7 +22,8 @@ Caracteristicas:
 - AI gpt-3.5-turbo inicialmente, en python con openai==0.28.1
 - En gitgnore, se agrega el archivo .env
 - Las credenciales se suben en render directamente
-
+- Se actualiza presentación del portafolio como Lista, y prompt invoca lista no la genera
+- Se actualiza estado del usuario, para su categorización como posible cliente
 
 """
 #_______________________________________________________________________________________
@@ -55,7 +56,7 @@ with app.app_context():
 # --- Recursos ---
 IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1747884690/imagen_index_wjog6p.jpg"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
-
+ESTADO_USUARIO = ""
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -145,8 +146,7 @@ def send_ia_prompt(prompt,telefono_id):
 
 """Función que mantenie el flujo de la conversación de la IA"""
 
-#def send_ia_message(telefono_id, message_text, chat_history):
-def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
+def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, chat_history_prompt, lang):
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     
     # 1. Si el usuario solicita ver el portafolio
@@ -177,7 +177,7 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        send_message_and_log(telefono_id, respuesta_bot, 'text')
+        send_message_and_log(ESTADO_USUARIO,telefono_id, respuesta_bot, 'text')
 
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
@@ -268,21 +268,26 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "start":
         user_language = "es"
-        send_initial_messages(telefono_id, user_language)        
+        ESTADO_USUARIO = "nuevo"
+        send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif mensaje_procesado == "btn_si1":
         user_language = "es"
-        request1_messages(telefono_id, user_language)  
+        ESTADO_USUARIO = "interesado"
+        request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         user_language = "es"
+        ESTADO_USUARIO = "no_interesado"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
-    elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"]:
+        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+    elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
         user_language = "es"
+        ESTADO_USUARIO = "interesado"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
         user_language = "es"
-        request1_messages(telefono_id, user_language)
+        ESTADO_USUARIO = "quiere_asesor"
+        send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
@@ -294,15 +299,16 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
 
 
-def send_initial_messages(telefono_id, lang):
+def send_initial_messages(ESTADO_USUARIO,telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
     # Saludo en el idioma elegido
+
     message_response = get_message(lang, "welcome_initial")
-    send_message_and_log(telefono_id, message_response, 'text')
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'image')
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'image')
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
@@ -318,8 +324,9 @@ def send_initial_messages(telefono_id, lang):
     no_id = "btn_no1"
 
     message_response_for_buttons = get_message(lang, "greeting_text2")
-    
+
     send_message_and_log(
+        ESTADO_USUARIO,
         telefono_id, 
         message_response_for_buttons, 
         'button', 
@@ -328,13 +335,14 @@ def send_initial_messages(telefono_id, lang):
     )
 
 
-def request1_messages(telefono_id, lang):
+def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
     #titulos
 
     message_response_for_list = get_message(lang, "portafolio")
-    
+
     send_message_and_log(
+        ESTADO_USUARIO,
         telefono_id, 
         message_response_for_list, 
         'list', 
@@ -349,13 +357,16 @@ def request1_messages(telefono_id, lang):
                       "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
     )
 
-def send_adviser_messages(telefono_id, lang):
+def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
     """El usuario esta interesado y quiere concretar una cita"""
-    message_response = get_message(lang, "agent")
-    send_message_and_log(telefono_id, message_response, 'text')
+
+    #message_response = get_message(lang, "agent")
+    #send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
+    chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+    send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
 
 
-def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
+def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -450,7 +461,7 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
         'telefono_usuario_id': telefono_id,
         'plataforma': 'whatsapp 📞📱💬',
         'mensaje': message_text, # El texto del mensaje que se envía
-        'estado_usuario': 'enviado',
+        'estado_usuario': ESTADO_USUARIO,
         'etiqueta_campana': 'Respuesta Bot',
         'agente': AGENTE_BOT
     }
