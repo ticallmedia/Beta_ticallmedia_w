@@ -92,7 +92,7 @@ MESSAGES = {
             "'btn_9' corresponds to 'Display Media 📺'"
             "'btn_0' corresponds to 'Talk to an Agent 🗣️'"
 
-            "If you detect one of these buttons, kindly respond with a short description of the selected service and continue the guided conversation. If the user selects "btn_0", "
+            "If you detect one of these buttons, kindly respond with a short description of the selected service and continue the guided conversation. If the user selects 'btn_0', "
             "inform them that a human agent will contact them shortly."
 
             "If the user types 'portfolio', do not respond yourself. The system will automatically display the interactive list of services."
