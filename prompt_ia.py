@@ -4,8 +4,8 @@ MESSAGES = {
         "greeting_text1": "¡Saludos! 🤖 ¿Intrigado por una estrategia de marketing más inteligente?",
         "greeting_text2": "En TicAll Media, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
         #"portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
-        "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Elige una opción ",
-        "list_footer_text":"Elige una de las opciones para poder ayudarte:",
+        "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n",
+        "list_footer_text":"Elige una de las opciones para poder ayudarte 📌:",
         "list_button_text": "Ver Portafolio",
         "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
         "prompt_ia_yes": (
@@ -15,17 +15,25 @@ MESSAGES = {
             "Para comenzar, te pediré tu nombre completo para poder dirigirme a ti de forma más cercana. "
             "Si no lo proporcionas de inmediato, te lo volveré a solicitar más adelante con amabilidad 😊.\n\n"
 
-            "No mostraré nuevamente las opciones del portafolio, a menos que tú lo solicites explícitamente.\n"
-            "1️⃣. DDA And Mobile Campaigns. 📱\n"
-            "2️⃣. WebSites. 🌐\n"
-            "3️⃣. Photography. 📸\n"
-            "4️⃣. Content Marketing. ✍️\n"
-            "5️⃣. Media Strategy. 📈\n"
-            "6️⃣. Digital Marketing. 💻\n"
-            "7️⃣. Paid Social Media. 📊\n"
-            "8️⃣. Ecommerce Strategy. 🛒\n"
-            "9️⃣. Display Media Planning. 📺\n"
-            "0️⃣. Hablar con un Agente. 🗣️"
+            "No mostraré nuevamente las opciones del portafolio,\n"
+
+            "Cuando el usuario seleccione uno de los botones del portafolio, estos son los equivalentes:"
+
+            "'btn_1' corresponde a 'DDA & Mobile Campaigns' 📱"
+            "'btn_2' corresponde a 'Websites 🌐'"
+            "'btn_3' corresponde a 'Advertising Photography 📸'"
+            "'btn_4' corresponde a 'Content Marketing ✍️'"
+            "'btn_5' corresponde a 'Media Strategy 📈'"
+            "'btn_6' corresponde a 'Digital Marketing 💻'"
+            "'btn_7' corresponde a 'Paid Social Media 📊'"
+            "'btn_8' corresponde a 'E-commerce Strategy 🛒'"
+            "'btn_9' corresponde a 'Display Media 📺'"
+            "'btn_0' corresponde a 'Hablar con un agente 🗣️'"
+
+            "Si detectas alguno de esos botones, responde de forma amable con una breve descripción del servicio y continúa la conversación. Si el usuario elige 'btn_0', "
+            "informa que será atendido por un asesor"
+
+            "Si el usuario escribe ‘portafolio’, no respondas tú. El sistema mostrará la lista interactiva automáticamente."
 
             "Asumiré que ya has elegido una de estas opciones. Continuaré la conversación con información específica sobre ese servicio.\n\n"
 
@@ -58,8 +66,8 @@ MESSAGES = {
         "greeting_text1": "Greetings! 🤖 Intrigued by a smarter marketing strategy?",
         "greeting_text2": "At TicAll Media, we have ideas that might surprise you.\n\nReady to explore?",
         #"portafolio": "🚀 Are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
-        "portafolio": "🚀 Looking for advice on a special service?\n\n📌 Choose an option ",
-        "list_footer_text":"Please choose one of the options to help you:",
+        "portafolio": "🚀 Looking for advice on a special service?\n",
+        "list_footer_text":"Please choose one of the options to help you 📌:",
         "list_button_text": "View Portfolio",
         "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
         "prompt_ia_yes_en": (
@@ -69,17 +77,25 @@ MESSAGES = {
             "To start, I’ll ask for your full name so I can address you more personally. "
             "If you don’t provide it right away, don’t worry — I’ll kindly ask again later 😊.\n\n"
 
-            "I won’t display the list of available services unless you specifically ask to see them again.\n"
-            "1️⃣. DDA And Mobile Campaigns. 📱"
-            "2️⃣. Websites. 🌐"
-            "3️⃣. Photography. 📸"
-            "4️⃣. Content Marketing. ✍️"
-            "5️⃣. Media Strategy. 📈"
-            "6️⃣. Digital Marketing. 💻\n"
-            "7️⃣. Paid Social Media. 📊\n"
-            "8️⃣. Ecommerce Strategy. 🛒\n"
-            "9️⃣. Display Media Planning. 📺\n"
-            "0️⃣. Speak with an Agent. 🗣️"
+            "I won't show the portfolio options again,\n"
+            
+            "When the user selects one of the portfolio buttons, these are the corresponding meanings:"
+
+            "'btn_1' corresponds to 'DDA & Mobile Campaigns 📱'"
+            "'btn_2' corresponds to 'Websites 🌐'"
+            "'btn_3' corresponds to 'Advertising Photography 📸'"
+            "'btn_4' corresponds to 'Content Marketing ✍️'"
+            "'btn_5' corresponds to 'Media Strategy 📈'"
+            "'btn_6' corresponds to 'Digital Marketing 💻'"
+            "'btn_7' corresponds to 'Paid Social Media 📊'"
+            "'btn_8' corresponds to 'E-commerce Strategy 🛒'"
+            "'btn_9' corresponds to 'Display Media 📺'"
+            "'btn_0' corresponds to 'Talk to an Agent 🗣️'"
+
+            "If you detect one of these buttons, kindly respond with a short description of the selected service and continue the guided conversation. If the user selects "btn_0", "
+            "inform them that a human agent will contact them shortly."
+
+            "If the user types 'portfolio', do not respond yourself. The system will automatically display the interactive list of services."
 
             "I'll assume you've already chosen a service from our portfolio. I'll continue the conversation with specific information about that service.\n\n"
 

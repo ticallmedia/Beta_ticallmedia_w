@@ -144,16 +144,26 @@ def send_ia_prompt(prompt,telefono_id):
     return list(user_histories[telefono_id])
 
 """Función que mantenie el flujo de la conversación de la IA"""
-def send_ia_message(telefono_id, message_text, chat_history):
 
+#def send_ia_message(telefono_id, message_text, chat_history):
+def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     
+    # 1. Si el usuario solicita ver el portafolio
+    if message_text in ["portafolio", "ver servicios", "mostrar opciones", "servicios"]:
+        request1_messages(telefono_id, lang)
+        return
+
+    # 2. Cargar historial si ya existe o iniciarlo con prompt
+    if telefono_id not in user_histories:
+        user_histories[telefono_id] = chat_history_prompt
+
+    chat_history = user_histories[telefono_id]
+    
+    # Agregar el mensaje del usuario al historial
+    chat_history.append({"role": "user", "content": message_text})
+
     try:
-        mensaje_usuario = message_text
-
-        # Agregar el mensaje del usuario al historial
-        chat_history.append({"role": "user", "content": mensaje_usuario})
-
         # Solicitar respuesta a OpenAI
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -265,22 +275,22 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history)
-    elif mensaje_procesado in ["1","2","3","4","5","6","7","8","9","btn_1","btn_2"]:
+        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+    elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history)
-    elif mensaje_procesado == "0" or mensaje_procesado == "asesor":
+        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+    elif mensaje_procesado in ["btn_0" ,"asesor"]:
         user_language = "es"
         request1_messages(telefono_id, user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
     else:
         user_language = "es"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history)
+        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
 
 
 
@@ -318,11 +328,6 @@ def send_initial_messages(telefono_id, lang):
     )
 
 
-#def request1_messages(telefono_id, lang):
-    """El usuario esta interesado y desea conocer mas del tema"""
- #   message_response = get_message(lang, "portafolio")
-  #  send_message_and_log(telefono_id, message_response, 'text')
-
 def request1_messages(telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
     #titulos
@@ -333,9 +338,15 @@ def request1_messages(telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = [". Ads 📱.",". WebSites. 🌐"], # Pasamos los títulos que varían por idioma
-        list_ids = ["btn_1","btn_2"],           # Pasamos los IDs fijos
-        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios"] #pasan las descripciones de cada opcion 
+        list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
+                       "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
+                       "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
+                       "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
+        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
+        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
+                      "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
+                      "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
+                      "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
     )
 
 def send_adviser_messages(telefono_id, lang):
@@ -417,9 +428,9 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
             "interactive": {
                 "type": "list",
                 "body": {"text": message_text},
-                "footer": {"text": "Elige una de las opciones para poder ayudarte:"},
+                "footer": {"text": get_message("es", "list_footer_text")},
                 "action": {
-                    "button": "Ver Portafolio",
+                    "button": "Portafolio",
                     "sections": [
                         {
                             "title": "Servicios disponibles",
