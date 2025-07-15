@@ -13,7 +13,7 @@ import threading
 load_dotenv()
 #_______________________________________________________________________________________
 """
-Version 1:
+Version 2:
 Descripción: Primer Bot de Whatsapp para la empresa TicAll Media, 
 integrado con IA
 
