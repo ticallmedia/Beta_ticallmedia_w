@@ -13,9 +13,9 @@ import threading
 load_dotenv()
 #_______________________________________________________________________________________
 """
-Version 2:
+Version 3:
 Descripción: Primer Bot de Whatsapp para la empresa TicAll Media, 
-integrado con IA
+integrado con IA de OpenAI
 
 Caracteristicas: 
 
@@ -25,6 +25,10 @@ Caracteristicas:
 - Se actualiza presentación del portafolio como Lista, y prompt invoca lista no la genera
 - Se actualiza estado del usuario, para su categorización como posible cliente
 
+Actualiza 15/07/2025:
+-Se cambia bd SQLite a PostgreSQl para mejorar la persistencia de los datos
+-Tambien para utilizar mas de Una API para consultar la misma fuente de datos
+
 """
 #_______________________________________________________________________________________
 app = Flask(__name__)
@@ -33,7 +37,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Configuración de base de datos SQLITE
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///metapython.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
