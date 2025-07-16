@@ -53,9 +53,19 @@ class Log(db.Model):
     etiqueta_campana = db.Column(db.Text)
     agente = db.Column(db.Text)
 
+class UsuariosBot(db.Model):
+    id = db.Column(db.Integer, primary_keyu=True)
+    lang = db.Column(db.Text)
+    telefono_usuario_id = db.Column(db.Text) #es ell mismo whatsapp_id
+    crm_contact_id = db.Column(db.Text)
+    nombre_preferido = db.Column(db.Text)
+    estado_usuario = db.Column(db.Text)
+    fecha_y_hora = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Crear tabla si no existe
 with app.app_context():
     db.create_all()
+    logging.info(f"Creación de tablas usuario y de conversacion...")
 #_______________________________________________________________________________________
 
 # --- Recursos ---
