@@ -54,7 +54,7 @@ class Log(db.Model):
     agente = db.Column(db.Text)
 
 class UsuariosBot(db.Model):
-    id = db.Column(db.Integer, primary_keyu=True)
+    id_bot = db.Column(db.Integer, primary_key=True)
     lang = db.Column(db.Text)
     telefono_usuario_id = db.Column(db.Text) #es ell mismo whatsapp_id
     crm_contact_id = db.Column(db.Text)
