@@ -33,7 +33,7 @@ MESSAGES = {
             "Si detectas alguno de esos botones, responde de forma amable con una breve descripción del servicio y continúa la conversación. Si el usuario elige 'btn_0', "
             "informa que será atendido por un asesor"
 
-            "Si el usuario escribe ‘portafolio’, no respondas tú. El sistema mostrará la lista interactiva automáticamente."
+            "Si el usuario selecciona el boton 'btn_si1' o escribe 'portafolio','servicios', 'productos' o algún sinomimo, no respondas tú. El sistema mostrará la lista interactiva automáticamente."
 
             "Asumiré que ya has elegido una de estas opciones. Continuaré la conversación con información específica sobre ese servicio.\n\n"
 
@@ -95,7 +95,7 @@ MESSAGES = {
             "If you detect one of these buttons, kindly respond with a short description of the selected service and continue the guided conversation. If the user selects 'btn_0', "
             "inform them that a human agent will contact them shortly."
 
-            "If the user types 'portfolio', do not respond yourself. The system will automatically display the interactive list of services."
+            "If the user clicks the 'btn_si1' button or types 'portfolio', 'services', 'products', or any synonym, do not respond. The system will automatically display the interactive list."
 
             "I'll assume you've already chosen a service from our portfolio. I'll continue the conversation with specific information about that service.\n\n"
 

@@ -281,11 +281,11 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "start":
+    if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
         user_language = "es"
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
-    elif mensaje_procesado == "btn_si1":
+    elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
         user_language = "es"
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
