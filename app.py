@@ -278,12 +278,14 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         'agente': AGENTE_BOT
     }
 
-    portafolio_clave = ["portafolio","catalogo","servicios","productos"]
+    saludo_clave = ["hola","hi","hello","start","alo"]
+    portafolio_clave = ["portafolio","catálogo","servicios","productos"]
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
+    #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
+    if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         user_language = "es"
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
