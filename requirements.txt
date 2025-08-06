@@ -16,6 +16,7 @@ greenlet==3.2.3
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
+langdetect==1.0.9
 load-dotenv==0.1.0
 MarkupSafe==3.0.2
 multidict==6.5.0
@@ -24,6 +25,7 @@ propcache==0.3.2
 psycopg2==2.9.10
 python-dotenv==1.1.0
 requests==2.32.4
+six==1.17.0
 SQLAlchemy==2.0.41
 tqdm==4.67.1
 typing_extensions==4.14.0
