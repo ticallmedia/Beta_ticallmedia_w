@@ -81,6 +81,8 @@ with app.app_context():
 IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1747884690/imagen_index_wjog6p.jpg"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
 ESTADO_USUARIO = ""
+saludo_clave = ["hola","hi","hello","start","alo"]
+portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -187,8 +189,10 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, chat_history_prom
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     
     # 1. Si el usuario solicita ver el portafolio
-    if message_text in ["portafolio", "ver servicios", "mostrar opciones", "servicios"]:
-        request1_messages(telefono_id, lang)
+    #if message_text in ["portafolio", "ver servicios", "mostrar opciones", "servicios"]:
+        #request1_messages(telefono_id, lang)
+    if "servicio" in  message_text or any (palabra in message_text for palabra in portafolio_clave):
+        request1_messages(ESTADO_USUARIO, telefono_id, lang)  
         return
 
     # 2. Cargar historial si ya existe o iniciarlo con prompt
@@ -300,8 +304,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         'agente': AGENTE_BOT
     }
 
-    saludo_clave = ["hola","hi","hello","start","alo"]
-    portafolio_clave = ["portafolio","catálogo","servicios","productos"]
+    #saludo_clave = ["hola","hi","hello","start","alo"]
+    #portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
