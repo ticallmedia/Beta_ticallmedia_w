@@ -172,7 +172,7 @@ user_histories = {}
 def send_ia_prompt(prompt,telefono_id,lang):
     try:
         openai.api_key = os.environ.get("OPENAI_API_KEY")
-        message_prompt = get_message(lang, prompt)
+        message_prompt = get_message("es", prompt)
 
         if telefono_id not in user_histories:
             user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
