@@ -511,7 +511,7 @@ def send_message_and_log(lang,ESTADO_USUARIO,telefono_id, message_text, message_
                 "body": {"text": message_text},
                 "footer": {"text": get_message(lang, "list_footer_text")},
                 "action": {
-                    "button": "Portafolio",
+                    "button": get_message(lang, "portafolio1"),
                     "sections": [
                         {
                             "title": "Servicios disponibles",
