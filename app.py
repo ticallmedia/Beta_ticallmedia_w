@@ -415,7 +415,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
                         "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
                         "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
         )
-    elif "es" in lang:
+    elif "en" in lang:
         send_message_and_log(
             lang,
             ESTADO_USUARIO,
