@@ -72,7 +72,7 @@ MESSAGES = {
         "list_footer_text":"Please choose one of the options to help you 📌:",
         "list_button_text": "View Portfolio",
         "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
-        "prompt_ia_yes_en": (
+        "prompt_ia_yes": (
             "Hi there! 👋 I'm TicAll Media virtual assistant 😊. I'm here to help you request any of our digital services. "
             "I'll assist you with a positive attitude, respect, and plenty of emojis to make our chat more enjoyable 😄✨.\n\n"
 
