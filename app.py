@@ -148,8 +148,8 @@ def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
     if usuario:
         #return {'lang': usuario.lang}
-        return {usuario.lang}
-    return ""
+        return usuario.lang
+    return "es"
 
 # --- detecta el idioma si es español o ingles ---
 def detectar_idioma(texto):
@@ -385,7 +385,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         user_language = obtener_idioma_usuario(telefono_id)
-        
+
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         ESTADO_USUARIO = "neutro"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
