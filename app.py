@@ -133,9 +133,9 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
             db.session.rollback() # Si hay un error, revertir la transacción
             logging.error(f"Error añadiendo log a DB (hilo): {e}")
 
-
+"""
 def guardar_idioma_usuario(datos_json):
-    """Agrega un registro de mensaje a la base de datos."""
+    #Agrega un registro de mensaje a la base de datos.
     datos = json.loads(datos_json)
     nuevo_registro = UsuarioLagn(
         telefono_usuario_id = datos.get('telefono_usuario_id'),
@@ -143,6 +143,19 @@ def guardar_idioma_usuario(datos_json):
     )
     db.session.add(nuevo_registro)
     db.session.commit()
+
+"""
+
+def guardar_idioma_usuario(telefono_usuario_id, idioma):
+    """Guarda o actualiza el idioma del usuario."""
+    usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
+    if usuario:
+        usuario.lang = idioma
+    else:
+        usuario = UsuarioLagn(telefono_usuario_id=telefono_usuario_id, lang=idioma)
+        db.session.add(usuario)
+    db.session.commit()
+
 
 def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
@@ -157,12 +170,15 @@ def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     idioma_actual = obtener_idioma_usuario(telefono_usuario_id)
 
     if idioma_detectado != idioma_actual:
+        """
         lang_data_out = {
             'telefono_usuario_id': telefono_usuario_id,
             'lang': idioma_detectado
             }
         
         guardar_idioma_usuario(json.dumps(lang_data_out))
+        """
+        guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
 
     return idioma_detectado
 
@@ -351,8 +367,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
-        #actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
+        #user_language = detectar_idioma(mensaje_procesado)
+        actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
 
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
