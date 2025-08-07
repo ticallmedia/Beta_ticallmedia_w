@@ -75,11 +75,12 @@ class UsuariosBot(db.Model):
     estado_usuario = db.Column(db.Text)
     fecha_y_hora = db.Column(db.DateTime, default=datetime.utcnow)
 
-
+"""
 # borrado de tablas
 with app.app_context():
     UsuarioLagn.__table__.drop(db.engine)
     logging.info(f"Borrado de tablas..")
+"""
 
 # Crear tabla si no existe
 with app.app_context():
