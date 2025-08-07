@@ -157,7 +157,7 @@ def obtener_idioma_usuario(telefono_usuario_id):
         logging.info(f"El idioma del usuario {telefono_usuario_id}  es: {usuario.lang}")
         return usuario.lang
     
-    logging.info(f"El usuario {telefono_usuario_id} no tiene idoma se le asiga: es")
+    logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
     return 'es'
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
@@ -364,8 +364,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
         #user_language = "es"
-        #user_language = detectar_idioma(mensaje_procesado)
-        user_language = obtener_idioma_usuario(telefono_id)        
+        user_language = detectar_idioma(mensaje_procesado)
+        #user_language = obtener_idioma_usuario(telefono_id)        
         
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
@@ -373,6 +373,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         user_language = obtener_idioma_usuario(telefono_id)
+
         ESTADO_USUARIO = "no_interesado"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
@@ -454,7 +455,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
 
     message_response_for_list = get_message(lang, "portafolio")
 
-    if lang == "es":
+    if lang == 'es':
         send_message_and_log(
             lang,
             ESTADO_USUARIO,
