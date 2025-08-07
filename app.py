@@ -83,6 +83,7 @@ AGENTE_BOT = "Bot" # Usamos una constante para el agente
 ESTADO_USUARIO = ""
 saludo_clave = ["hola","hi","hello","start","alo"]
 portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
+user_language = ""
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -292,7 +293,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     Registra el mensaje entrante y la respuesta en la base de datos y Google Sheets.
     """
     mensaje_procesado = mensaje_recibido.lower()
-    user_language = ""
+    #
     
     # Primero, registra el mensaje entrante
     log_data_in = {
