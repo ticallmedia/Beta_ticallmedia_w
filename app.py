@@ -181,7 +181,7 @@ def detectar_idioma(texto):
         elif idioma == 'en':
             return 'en' #ingles
         else:
-            return 'en'
+            return 'es'
     except:
         return 'es' #por defecto español
 
@@ -189,12 +189,12 @@ def detectar_idioma(texto):
 # --- API WhatsApp para el envío de mensajes ---
 def send_whatsapp_message(data):
     """Envía un mensaje a través de la API de WhatsApp Business."""
-    data = json.dumps(data, ensure_ascii=False)
+    data = json.dumps(data)
 
     #se agrega la codificación utf-8 para que las listas pasen sin problema
     encoded_data = data.encode('utf-8')
     headers = {
-        "Content-Type": "application/json; charset=UTF-8",
+        "Content-Type": "application/json",
         "Authorization": f"Bearer {os.environ['META_WHATSAPP_ACCESS_TOKEN']}"
     }
 
@@ -364,8 +364,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
         #user_language = "es"
-        #user_language = detectar_idioma(mensaje_procesado)
-        user_language = str(obtener_idioma_usuario(telefono_id)        )
+        user_language = detectar_idioma(mensaje_procesado)
+        #user_language = obtener_idioma_usuario(telefono_id)        
         logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
         ESTADO_USUARIO = "interesado"
