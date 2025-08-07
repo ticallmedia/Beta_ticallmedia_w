@@ -334,9 +334,9 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         idioma1 = ''
         #debido a que al analizar los botonoes no reconoce el idioma se agrega la palabra del idioma 
         if user_language == 'es':
-            idioma1== 'español'
+            idioma1 = 'español'
         else:
-            idioma1 == 'english'
+            idioma1 = 'english'
         
         user_language = detectar_idioma(f'{mensaje_procesado} {idioma1}')
         ESTADO_USUARIO = "interesado"
