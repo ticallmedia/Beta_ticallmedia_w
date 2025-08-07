@@ -156,9 +156,9 @@ def obtener_idioma_usuario(telefono_usuario_id):
     if usuario:
         logging.info(f"El idioma del usuario {telefono_usuario_id}  es: {usuario.lang}")
         return usuario.lang
-    
-    logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
-    return 'es'
+    else:
+        logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
+        return 'es'
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     """Detecta y actualiza el idioma del usuario si cambió."""
@@ -364,9 +364,10 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
-        #user_language = obtener_idioma_usuario(telefono_id)        
-        
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)        
+        logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
+
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
