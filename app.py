@@ -368,7 +368,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
-        actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
+        user_language = actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
 
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
