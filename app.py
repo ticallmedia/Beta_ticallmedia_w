@@ -133,7 +133,7 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
             db.session.rollback() # Si hay un error, revertir la transacción
             logging.error(f"Error añadiendo log a DB (hilo): {e}")
 
-"""
+
 def guardar_idioma_usuario(datos_json):
     #Agrega un registro de mensaje a la base de datos.
     datos = json.loads(datos_json)
@@ -147,7 +147,7 @@ def guardar_idioma_usuario(datos_json):
 """
 
 def guardar_idioma_usuario(telefono_usuario_id, idioma):
-    """Guarda o actualiza el idioma del usuario."""
+    #Guarda o actualiza el idioma del usuario.
     usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
     if usuario:
         usuario.lang = idioma
@@ -155,7 +155,7 @@ def guardar_idioma_usuario(telefono_usuario_id, idioma):
         usuario = UsuarioLagn(telefono_usuario_id=telefono_usuario_id, lang=idioma)
         db.session.add(usuario)
     db.session.commit()
-
+"""
 
 def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
@@ -170,15 +170,15 @@ def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     idioma_actual = obtener_idioma_usuario(telefono_usuario_id)
 
     if idioma_detectado != idioma_actual:
-        """
+        
         lang_data_out = {
             'telefono_usuario_id': telefono_usuario_id,
             'lang': idioma_detectado
             }
         
         guardar_idioma_usuario(json.dumps(lang_data_out))
-        """
-        guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
+        
+        #guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
 
     return idioma_detectado
 
