@@ -83,7 +83,7 @@ AGENTE_BOT = "Bot" # Usamos una constante para el agente
 ESTADO_USUARIO = ""
 saludo_clave = ["hola","hi","hello","start","alo"]
 portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
-user_language = ""
+user_language1 = ""
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -293,7 +293,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     Registra el mensaje entrante y la respuesta en la base de datos y Google Sheets.
     """
     mensaje_procesado = mensaje_recibido.lower()
-    #
+    user_language = ""
     
     # Primero, registra el mensaje entrante
     log_data_in = {
@@ -311,21 +311,21 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-    #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         #user_language = "es"
         user_language = detectar_idioma(mensaje_procesado)
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
-    #elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
         #user_language = "es"
         user_language = detectar_idioma(mensaje_procesado)
+        user_language1 = user_language
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         #user_language = "es"
         user_language = detectar_idioma(mensaje_procesado)
+        user_language1 = user_language
         ESTADO_USUARIO = "no_interesado"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
@@ -334,9 +334,9 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         
         idioma1 = ''
         #debido a que al analizar los botonoes no reconoce el idioma se agrega la palabra del idioma 
-        if user_language == 'es':
+        if user_language1 == 'es':
             idioma1 = 'español'
-        elif user_language == 'en':
+        elif user_language1 == 'en':
             idioma1 = 'english'
         else:
             idioma1 = 'español'
