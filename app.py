@@ -154,10 +154,10 @@ def guardar_idioma_usuario(telefono_usuario_id, idioma):
 def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLang.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
     if usuario:
-        logging.info(f"El idioma del usuario es: {usuario.lang}")
+        logging.info(f"El idioma del usuario {telefono_usuario_id}  es: {usuario.lang}")
         return usuario.lang
     
-    logging.info(f"El idioma del usuario es: 'es'")
+    logging.info(f"El idioma del usuario {telefono_usuario_id} es: 'es'")
     return "es"
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
@@ -168,7 +168,7 @@ def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     if idioma_detectado != idioma_actual:        
         guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
     
-    logging.info(f"El idioma del usuario es: {idioma_detectado}")
+    logging.info(f"El idioma del usuario {telefono_usuario_id} es: {idioma_detectado}")
     return idioma_detectado
 
 # --- detecta el idioma si es español o ingles ---
@@ -365,6 +365,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         user_language = obtener_idioma_usuario(telefono_id)        
+        
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
