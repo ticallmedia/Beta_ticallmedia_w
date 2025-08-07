@@ -366,7 +366,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         #user_language = obtener_idioma_usuario(telefono_id)        
-        logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
+        #logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
@@ -456,7 +456,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
 
     message_response_for_list = get_message(lang, "portafolio")
 
-    if lang == 'es':
+    if lang == "es":
         send_message_and_log(
             lang,
             ESTADO_USUARIO,
