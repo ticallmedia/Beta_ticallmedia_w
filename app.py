@@ -177,7 +177,7 @@ def detectar_idioma(texto):
         else:
             return 'en'
     except:
-        return 'en' #por defecto ingles
+        return 'es' #por defecto español
 
 
 # --- API WhatsApp para el envío de mensajes ---
