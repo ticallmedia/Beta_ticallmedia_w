@@ -374,6 +374,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         user_language = str(obtener_idioma_usuario(telefono_id))
+        
 
         ESTADO_USUARIO = "no_interesado"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id,user_language)
