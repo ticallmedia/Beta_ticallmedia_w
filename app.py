@@ -154,8 +154,10 @@ def guardar_idioma_usuario(telefono_usuario_id, idioma):
 def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLang.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
     if usuario:
-        #return {'lang': usuario.lang}
+        logging.info(f"El idioma del usuario es: {usuario.lang}")
         return usuario.lang
+    
+    logging.info(f"El idioma del usuario es: 'es'")
     return "es"
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
@@ -163,17 +165,10 @@ def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     idioma_detectado = detectar_idioma(mensaje)
     idioma_actual = obtener_idioma_usuario(telefono_usuario_id)
 
-    if idioma_detectado != idioma_actual:
-        
-        lang_data_out = {
-            'telefono_usuario_id': telefono_usuario_id,
-            'lang': idioma_detectado
-            }
-        
-        guardar_idioma_usuario(json.dumps(lang_data_out))
-        
-        #guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
-
+    if idioma_detectado != idioma_actual:        
+        guardar_idioma_usuario(telefono_usuario_id, idioma_detectado)
+    
+    logging.info(f"El idioma del usuario es: {idioma_detectado}")
     return idioma_detectado
 
 # --- detecta el idioma si es español o ingles ---
