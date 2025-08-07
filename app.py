@@ -330,7 +330,14 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
+        
+        idioma1 = ''
+        if user_language == 'es':
+            idioma1== 'español'
+        else:
+            idioma1 == 'english'
+        
+        user_language = detectar_idioma(f'{mensaje_procesado} {idioma1}')
         ESTADO_USUARIO = "interesado"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
