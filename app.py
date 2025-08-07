@@ -158,7 +158,7 @@ def obtener_idioma_usuario(telefono_usuario_id):
         return usuario.lang
     else:
         logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
-        return 'es'
+        return 'en'
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     """Detecta y actualiza el idioma del usuario si cambió."""
@@ -181,9 +181,9 @@ def detectar_idioma(texto):
         elif idioma == 'en':
             return 'en' #ingles
         else:
-            return 'es'
+            return 'en'
     except:
-        return 'es' #por defecto español
+        return 'en' #por defecto español
 
 
 # --- API WhatsApp para el envío de mensajes ---
@@ -366,7 +366,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
         #user_language = obtener_idioma_usuario(telefono_id)        
-        #logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
+        logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
