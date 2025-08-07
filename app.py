@@ -63,8 +63,7 @@ class Log(db.Model):
     agente = db.Column(db.Text)
 
 class UsuarioLagn(db.Model):
-    id_lang = db.Column(db.Integer, primary_key=True)
-    telefono_usuario_id = db.Column(db.Text) #es ell mismo whatsapp_id
+    telefono_usuario_id = db.Column(db.Text, primary_key=True) #es ell mismo whatsapp_id
     lang = db.Column(db.Text)
 
 class UsuariosBot(db.Model):
@@ -75,6 +74,11 @@ class UsuariosBot(db.Model):
     nombre_preferido = db.Column(db.Text)
     estado_usuario = db.Column(db.Text)
     fecha_y_hora = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# borrado de tablas
+with app.app_context():
+    UsuarioLagn.__table__.drop(db.Model)
 
 # Crear tabla si no existe
 with app.app_context():
@@ -134,17 +138,6 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
             logging.error(f"Error añadiendo log a DB (hilo): {e}")
 
 
-def guardar_idioma_usuario(datos_json):
-    #Agrega un registro de mensaje a la base de datos.
-    datos = json.loads(datos_json)
-    nuevo_registro = UsuarioLagn(
-        telefono_usuario_id = datos.get('telefono_usuario_id'),
-        lang = datos.get('idioma_detectado')
-    )
-    db.session.add(nuevo_registro)
-    db.session.commit()
-
-"""
 
 def guardar_idioma_usuario(telefono_usuario_id, idioma):
     #Guarda o actualiza el idioma del usuario.
@@ -155,7 +148,6 @@ def guardar_idioma_usuario(telefono_usuario_id, idioma):
         usuario = UsuarioLagn(telefono_usuario_id=telefono_usuario_id, lang=idioma)
         db.session.add(usuario)
     db.session.commit()
-"""
 
 def obtener_idioma_usuario(telefono_usuario_id):
     usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
