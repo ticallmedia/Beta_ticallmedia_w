@@ -189,12 +189,12 @@ def detectar_idioma(texto):
 # --- API WhatsApp para el envío de mensajes ---
 def send_whatsapp_message(data):
     """Envía un mensaje a través de la API de WhatsApp Business."""
-    data = json.dumps(data)
+    data = json.dumps(data, ensure_ascii=False)
 
     #se agrega la codificación utf-8 para que las listas pasen sin problema
     encoded_data = data.encode('utf-8')
     headers = {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=UTF-8",
         "Authorization": f"Bearer {os.environ['META_WHATSAPP_ACCESS_TOKEN']}"
     }
 
