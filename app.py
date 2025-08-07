@@ -62,6 +62,11 @@ class Log(db.Model):
     etiqueta_campana = db.Column(db.Text)
     agente = db.Column(db.Text)
 
+class UsuarioLagn(db.Model):
+    id_lang = db.Column(db.Integer, primary_key=True)
+    telefono_usuario_id = db.Column(db.Text) #es ell mismo whatsapp_id
+    lang = db.Column(db.Text)
+
 class UsuariosBot(db.Model):
     id_bot = db.Column(db.Integer, primary_key=True)
     lang = db.Column(db.Text)
@@ -83,7 +88,7 @@ AGENTE_BOT = "Bot" # Usamos una constante para el agente
 ESTADO_USUARIO = ""
 saludo_clave = ["hola","hi","hello","start","alo"]
 portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
-user_language1 = ""
+asesoria = ["asesor", "consultor", "consejero", "especialista", "orientador", "experto", "mentor","advisor", "consultant", "counselor", "specialist", "guide", "expert", "mentor"]
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -127,6 +132,24 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
         except Exception as e:
             db.session.rollback() # Si hay un error, revertir la transacción
             logging.error(f"Error añadiendo log a DB (hilo): {e}")
+
+
+def guardar_idioma_usuario(datos_json):
+    """Agrega un registro de mensaje a la base de datos."""
+    datos = json.loads(datos_json)
+    nuevo_registro = UsuarioLagn(
+        telefono_usuario_id = datos.get('telefono_usuario_id'),
+        lang = datos.get('plataforma')
+    )
+    db.session.add(nuevo_registro)
+    db.session.commit()
+
+def obtener_idioma_usuario(telefono_usuario_id):
+    usuario = UsuarioLagn.query.filter_by(telefono_usuario_id=telefono_usuario_id).first()
+    if usuario:
+        #return {'lang': usuario.lang}
+        return {usuario.lang}
+    return ""
 
 # --- detecta el idioma si es español o ingles ---
 def detectar_idioma(texto):
@@ -314,40 +337,42 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         #user_language = "es"
         user_language = detectar_idioma(mensaje_procesado)
+
+        lang_data_out = {
+            'telefono_usuario_id': telefono_id,
+            'lang': user_language
+            }
+        guardar_idioma_usuario(json.dumps(lang_data_out))
+
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
-        user_language1 = user_language
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)        
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
-        user_language1 = user_language
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)
         ESTADO_USUARIO = "no_interesado"
         chat_history = send_ia_prompt("prompt_ia_no", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
         #user_language = "es"
         
-        idioma1 = ''
-        #debido a que al analizar los botonoes no reconoce el idioma se agrega la palabra del idioma 
-        if user_language1 == 'es':
-            idioma1 = 'español'
-        elif user_language1 == 'en':
-            idioma1 = 'english'
-        else:
-            idioma1 = 'español'
-        
-        user_language = detectar_idioma(f'{mensaje_procesado} {idioma1}')
+        #user_language = detectar_idioma(f'{mensaje_procesado} {idioma1}')
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)
         ESTADO_USUARIO = "interesado"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
-    elif mensaje_procesado in ["btn_0" ,"asesor"]:
+    #elif mensaje_procesado in ["btn_0" ,"asesor"]:
+    elif "btn_0" in mensaje_procesado or any (palabra in mensaje_procesado for palabra in asesoria):
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)
         ESTADO_USUARIO = "quiere_asesor"
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
@@ -358,7 +383,9 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     else:
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
+        #user_language = detectar_idioma(mensaje_procesado)
+        user_language = obtener_idioma_usuario(telefono_id)
+        
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         ESTADO_USUARIO = "neutro"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
