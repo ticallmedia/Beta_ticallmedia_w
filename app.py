@@ -363,8 +363,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
-        #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
+        user_language = "es"
+        #user_language = detectar_idioma(mensaje_procesado)
         #user_language = obtener_idioma_usuario(telefono_id)        
         logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
