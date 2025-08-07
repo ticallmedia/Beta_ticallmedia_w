@@ -139,7 +139,7 @@ def guardar_idioma_usuario(datos_json):
     datos = json.loads(datos_json)
     nuevo_registro = UsuarioLagn(
         telefono_usuario_id = datos.get('telefono_usuario_id'),
-        lang = datos.get('plataforma')
+        lang = datos.get('idioma_detectado')
     )
     db.session.add(nuevo_registro)
     db.session.commit()
@@ -150,6 +150,21 @@ def obtener_idioma_usuario(telefono_usuario_id):
         #return {'lang': usuario.lang}
         return usuario.lang
     return "es"
+
+def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
+    """Detecta y actualiza el idioma del usuario si cambió."""
+    idioma_detectado = detectar_idioma(mensaje)
+    idioma_actual = obtener_idioma_usuario(telefono_usuario_id)
+
+    if idioma_detectado != idioma_actual:
+        lang_data_out = {
+            'telefono_usuario_id': telefono_usuario_id,
+            'lang': idioma_detectado
+            }
+        
+        guardar_idioma_usuario(json.dumps(lang_data_out))
+
+    return idioma_detectado
 
 # --- detecta el idioma si es español o ingles ---
 def detectar_idioma(texto):
@@ -336,13 +351,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
         #user_language = "es"
-        user_language = detectar_idioma(mensaje_procesado)
-
-        lang_data_out = {
-            'telefono_usuario_id': telefono_id,
-            'lang': user_language
-            }
-        guardar_idioma_usuario(json.dumps(lang_data_out))
+        #user_language = detectar_idioma(mensaje_procesado)
+        actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
 
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
