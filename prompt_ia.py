@@ -180,4 +180,11 @@ def get_message(lang, key):
     lang: 'en' para inglés, 'es' para español
     key: la clave del mensaje ('prompt', etc.)
     """
-    return MESSAGES.get(lang, MESSAGES["en"]).get(key, MESSAGES["en"].get(key, ""))
+    #return MESSAGES.get(lang, MESSAGES["en"]).get(key, MESSAGES["en"].get(key, ""))
+    idioma = MESSAGES.get(lang)
+
+    if idioma and key in idioma:
+        return idioma[key]
+    else:
+        return MESSAGES["en"].get(key,"")
+
