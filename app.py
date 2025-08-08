@@ -368,8 +368,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
         ESTADO_USUARIO = "interesado"
-        #request1_messages(ESTADO_USUARIO, telefono_id, user_language)
-        send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)    
+        request1_messages(ESTADO_USUARIO, telefono_id, user_language)
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
@@ -456,40 +455,21 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
 
     message_response_for_list = get_message(lang, "portafolio")
 
-    if lang == "es":
-        send_message_and_log(
-            lang,
-            ESTADO_USUARIO,
-            telefono_id, 
-            message_response_for_list, 
-            'list', 
-            list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
-                        "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
-                        "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
-                        "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
-            list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
-            list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
-                        "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
-                        "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
-                        "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
-        )
-    else:
-        send_message_and_log(
-            lang,
-            ESTADO_USUARIO,
-            telefono_id, 
-            message_response_for_list, 
-            'list', 
-            list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
-                        "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
-                        "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
-                        "Talk to an agent 🗣️"], # El titulo no debe superar 24 caracteres
-            list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
-            list_descrip=["DDA And Mobile Campaigns", "Website development", "Professional photography for brands",
-                        "Digital content strategies", "Digital media planning", "Multichannel digital marketing",
-                        "Paid social media advertising", "Ecommerce strategy", "Banner and media advertising",
-                        "Personalized service"] # la descripcion  no debe superar 72 caracteres
-        )
+    send_message_and_log(
+        ESTADO_USUARIO,
+        telefono_id, 
+        message_response_for_list, 
+        'list', 
+        list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
+                       "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
+                       "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
+                       "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
+        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
+        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
+                      "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
+                      "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
+                      "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
+    )
 
 def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
     """El usuario esta interesado y quiere concretar una cita"""
