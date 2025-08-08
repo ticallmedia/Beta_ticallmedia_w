@@ -206,12 +206,21 @@ def send_ia_prompt(prompt,telefono_id,lang):
         openai.api_key = os.environ.get("OPENAI_API_KEY")
         message_prompt = get_message(lang, prompt)
 
+        """"
+        #permite recordar la conversacion con el usuario, pero no permite refrescar el idioma
         if telefono_id not in user_histories:
             user_histories[telefono_id] = [
                 {"role": "system", "content": message_prompt},
                 {"role": "system", "content": f"Please always respond in '{lang}' language."}
                 ]
-        
+        """
+
+        #No recuerda la conversacion del usuario y permite refrescar el idioma
+        user_histories[telefono_id] = [
+            {"role": "system", "content": message_prompt},
+            {"role": "system", "content": f"Please always respond in '{lang}' language."}
+            ]
+
         logging.info(f"Consulta a la IA: {user_histories}")
     except Exception as e:
         logging.error(f"Error con la IA: {e}")
