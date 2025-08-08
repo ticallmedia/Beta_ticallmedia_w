@@ -6,7 +6,7 @@ MESSAGES = {
         #"portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n\n📌 Por favor, ingresa un número #️⃣ para recibir información.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Hablar con un Agente. 🗣️",
         "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n",
         "portafolio1": "Servicios",
-        "list_footer_text":"Elige:",
+        "list_footer_text":"Elige una de las opciones 📌:",
         "list_button_text": "Ver Portafolio",
         "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
         "list_titles1": [
@@ -93,7 +93,7 @@ MESSAGES = {
         #"portafolio": "🚀 Are you looking for advice on a special service?\n\n📌 Please enter a number #️⃣ to receive information.\n\n1️⃣. DDA And Mobile Campaigns. 📱\n2️⃣. WebSites. 🌐\n3️⃣. Photography. 📸\n4️⃣. Content Marketing. ✍️\n5️⃣. Media Strategy. 📈\n6️⃣. Digital Marketing. 💻\n7️⃣. Paid Social Media. 📊\n8️⃣. Ecommerce Strategy. 🛒\n9️⃣. Display Media Planning. 📺\n0️⃣. Talk to an Agent. 🗣️",
         "portafolio": "🚀 Looking for advice on a special service?\n",
         "portafolio1": "Service",
-        "list_footer_text":"Please :",
+        "list_footer_text":"Select an option 📌:",
         "list_button_text": "View Portfolio",
         "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
         "list_titles1": [

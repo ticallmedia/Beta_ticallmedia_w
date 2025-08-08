@@ -31,6 +31,13 @@ Actualiza 15/07/2025:
 -Se cambia bd SQLite a PostgreSQl para mejorar la persistencia de los datos
 -Tambien para utilizar mas de Una API para consultar la misma fuente de datos
 
+Actualiza 05/08/2025:
+-Se agrega la libreria 'langdetect', con el fin de poder identificar el idioma del usuario
+-Se crean las funciones: actualizar_idioma_si_cambia, guardar_idioma_usuario, obtener_idioma_usuario, detectar_idioma  
+para guardar, actualiza y obtener el idioma
+-se crea la tabal 'UsuarioLang' para capturar el idioma
+-se actualizan funciones para que siempre soliciten idioma
+
 """
 #_______________________________________________________________________________________
 app = Flask(__name__)
@@ -194,10 +201,10 @@ conversación con un usuario"""
 
 user_histories = {}
 
-def send_ia_prompt(prompt,telefono_id):
+def send_ia_prompt(prompt,telefono_id,lang):
     try:
         openai.api_key = os.environ.get("OPENAI_API_KEY")
-        message_prompt = get_message("es", prompt)
+        message_prompt = get_message(lang, prompt)
 
         if telefono_id not in user_histories:
             user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
@@ -352,14 +359,14 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = obtener_idioma_usuario(telefono_id)  
 
         ESTADO_USUARIO = "no_interesado"
-        chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
+        chat_history = send_ia_prompt("prompt_ia_no", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
         #user_language = "es"
         user_language = obtener_idioma_usuario(telefono_id)  
 
         ESTADO_USUARIO = "interesado"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
         #user_language = "es"
@@ -372,7 +379,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         user_language = obtener_idioma_usuario(telefono_id)  
 
         ESTADO_USUARIO = "calificado"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
     else:
         #user_language = "es"
@@ -380,7 +387,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         ESTADO_USUARIO = "neutro"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,user_language)
         send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
 
 
@@ -442,7 +449,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
 def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
     """El usuario esta interesado y quiere concretar una cita"""
 
-    chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+    chat_history = send_ia_prompt("prompt_ia_yes", telefono_id,lang)
     send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
 
 
