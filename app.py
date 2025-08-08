@@ -368,7 +368,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         logging.info(f"🔍 IDIOMA OBTENIDO: {user_language}")
 
         ESTADO_USUARIO = "interesado"
-        request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
+        #request1_messages(ESTADO_USUARIO, telefono_id, user_language)
+        send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)    
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         #user_language = "es"
         #user_language = detectar_idioma(mensaje_procesado)
