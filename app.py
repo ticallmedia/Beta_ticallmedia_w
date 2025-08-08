@@ -214,13 +214,31 @@ def send_ia_prompt(prompt,telefono_id,lang):
                 {"role": "system", "content": f"Please always respond in '{lang}' language."}
                 ]
         """
-
+        """
         #No recuerda la conversacion del usuario y permite refrescar el idioma
         user_histories[telefono_id] = [
             {"role": "system", "content": message_prompt},
             {"role": "system", "content": f"Please always respond in '{lang}' language."}
             ]
+        """
 
+        # Si ya hay historial, actualiza el primer mensaje si es de tipo 'system'
+        if telefono_id in user_histories:
+            # Reemplazar el primer system prompt (o agregar si no está)
+            user_histories[telefono_id][0] = {"role": "system", "content": message_prompt}
+            
+            # Verifica si hay un segundo mensaje indicando el idioma
+            if len(user_histories[telefono_id]) > 1 and user_histories[telefono_id][1]['role'] == "system":
+                user_histories[telefono_id][1] = {"role": "system", "content": f"Please always respond in '{lang}' language."}
+            else:
+                user_histories[telefono_id].insert(1, {"role": "system", "content": f"Please always respond in '{lang}' language."})
+        else:
+            # No hay historial, lo creamos
+            user_histories[telefono_id] = [
+                {"role": "system", "content": message_prompt},
+                {"role": "system", "content": f"Please always respond in '{lang}' language."}
+                ]
+        
         logging.info(f"Consulta a la IA: {user_histories}")
     except Exception as e:
         logging.error(f"Error con la IA: {e}")
