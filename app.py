@@ -241,7 +241,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, chat_history_prom
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        send_message_and_log(ESTADO_USUARIO,telefono_id, respuesta_bot, 'text')
+        send_message_and_log(lang,ESTADO_USUARIO,telefono_id, respuesta_bot, 'text')
 
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
@@ -390,11 +390,11 @@ def send_initial_messages(ESTADO_USUARIO,telefono_id, lang):
     # Saludo en el idioma elegido
 
     message_response = get_message(lang, "welcome_initial")
-    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
+    send_message_and_log(lang,ESTADO_USUARIO, telefono_id, message_response, 'text')
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'image')
+    send_message_and_log(lang,ESTADO_USUARIO, telefono_id, message_response, 'image')
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
@@ -412,6 +412,7 @@ def send_initial_messages(ESTADO_USUARIO,telefono_id, lang):
     message_response_for_buttons = get_message(lang, "greeting_text2")
 
     send_message_and_log(
+        lang,
         ESTADO_USUARIO,
         telefono_id, 
         message_response_for_buttons, 
@@ -428,6 +429,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     message_response_for_list = get_message(lang, "portafolio")
 
     send_message_and_log(
+        lang,
         ESTADO_USUARIO,
         telefono_id, 
         message_response_for_list, 
@@ -440,13 +442,11 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
 def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
     """El usuario esta interesado y quiere concretar una cita"""
 
-    #message_response = get_message(lang, "agent")
-    #send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
     chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
     send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
 
 
-def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
+def send_message_and_log(lang,ESTADO_USUARIO,telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -519,9 +519,9 @@ def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type=
             "interactive": {
                 "type": "list",
                 "body": {"text": message_text},
-                "footer": {"text": get_message("es", "list_footer_text")},
+                "footer": {"text": get_message(lang, "list_footer_text")},
                 "action": {
-                    "button": "Portafolio",
+                    "button": get_message(lang, "portafolio1"),
                     "sections": [
                         {
                             "title": "Servicios disponibles",
