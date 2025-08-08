@@ -9,6 +9,30 @@ MESSAGES = {
         "list_footer_text":"Elige una de las opciones para poder ayudarte 📌:",
         "list_button_text": "Ver Portafolio",
         "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
+        "list_titles1": [
+            "DDA & Mobile 📱",
+            "Websites 🌐",
+            "Photography 📸",
+            "Content Mktg ✍️",
+            "Media Strat 📈",
+            "Digital Mktg 💻",
+            "Paid Social 📊",
+            "Ecommerce Strat 🛒",
+            "Display Media 📺",
+            "Hablar con agente 🗣️"
+            ],
+        "list_descrip1": [
+            "DDA And Mobile Campaigns.",
+            "Desarrollo de sitios",
+            "Fotografía profesional para marcas",
+            "Estrategias de contenido digital",
+            "Planificación de medios digitales",
+            "Marketing digital multicanal",
+            "Anuncios pagados en redes sociales",
+            "Estrategia para tiendas en línea",
+            "Publicidad en banners y medios",
+            "Atención personalizada"
+            ],
         "prompt_ia_yes": (
             "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
             "Te atenderé con alegría, respeto y muchos emoticones para hacer esta experiencia más agradable 😄✨.\n\n"
@@ -72,6 +96,30 @@ MESSAGES = {
         "list_footer_text":"Please choose one of the options to help you 📌:",
         "list_button_text": "View Portfolio",
         "agent": "Just a moment, please. ⏳ We are connecting you with one of our agents. We'll be with you shortly! 😊",
+        "list_titles1": [
+            "DDA & Mobile 📱",
+            "Websites 🌐",
+            "Photography 📸",
+            "Content Mktg ✍️",
+            "Media Strat 📈",
+            "Digital Mktg 💻",
+            "Paid Social 📊",
+            "Ecommerce Strat 🛒",
+            "Display Media 📺",
+            "Hablar con agente 🗣️"
+            ],
+        "list_descrip1": [
+            "DDA And Mobile Campaigns", 
+            "Website development", 
+            "Professional photography for brands",
+            "Digital content strategies", 
+            "Digital media planning", 
+            "Multichannel digital marketing",
+            "Paid social media advertising", 
+            "Ecommerce strategy", 
+            "Banner and media advertising",
+            "Personalized service"
+            ],
         "prompt_ia_yes": (
             "Hi there! 👋 I'm TicAll Media virtual assistant 😊. I'm here to help you request any of our digital services. "
             "I'll assist you with a positive attitude, respect, and plenty of emojis to make our chat more enjoyable 😄✨.\n\n"

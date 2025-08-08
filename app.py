@@ -377,7 +377,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     else:
         #user_language = "es"
         user_language = obtener_idioma_usuario(telefono_id)  
-        
+
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         ESTADO_USUARIO = "neutro"
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
@@ -432,15 +432,9 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
-                       "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
-                       "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
-                       "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
+        list_titles = [get_message(lang, "list_titles1")], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
-        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
-                      "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
-                      "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
-                      "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
+        list_descrip=[get_message(lang, "list_descrip1")] # la descripcion  no debe superar 72 caracteres
     )
 
 def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
