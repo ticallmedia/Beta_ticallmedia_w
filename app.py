@@ -156,9 +156,8 @@ def obtener_idioma_usuario(telefono_usuario_id):
     if usuario:
         logging.info(f"El idioma del usuario {telefono_usuario_id}  es: {usuario.lang}")
         return usuario.lang
-    else:
-        logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
-        return 'en'
+    logging.info(f"El usuario {telefono_usuario_id} no tiene idioma se le asiga: es")
+    return 'es'
 
 def actualizar_idioma_si_cambia(telefono_usuario_id, mensaje):
     """Detecta y actualiza el idioma del usuario si cambió."""
