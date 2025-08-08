@@ -207,7 +207,10 @@ def send_ia_prompt(prompt,telefono_id,lang):
         message_prompt = get_message(lang, prompt)
 
         if telefono_id not in user_histories:
-            user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
+            user_histories[telefono_id] = [
+                {"role": "system", "content": message_prompt},
+                {"role": "system", "content": f"Please always respond in '{lang}' language."}
+                ]
         
         logging.info(f"Consulta a la IA: {user_histories}")
     except Exception as e:
