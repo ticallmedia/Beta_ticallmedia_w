@@ -199,7 +199,10 @@ def send_whatsapp_message(data):
 """"Función para cargar o actualizar prompt de la IA, y mantener el hilo de
 conversación con un usuario"""
 
-user_histories = {}
+# Diccionarios de control
+user_profiles = {}   # datos fijos del usuario (nombre, gustos, etc.)
+user_histories = {}  # historial de la conversación
+user_languages = {}  # idioma actual por usuario
 
 def send_ia_prompt(prompt,telefono_id,lang):
     try:
@@ -207,6 +210,8 @@ def send_ia_prompt(prompt,telefono_id,lang):
         message_prompt = get_message(lang, prompt)
 
         """"
+        #version 1
+
         #permite recordar la conversacion con el usuario, pero no permite refrescar el idioma
         if telefono_id not in user_histories:
             user_histories[telefono_id] = [
@@ -221,7 +226,8 @@ def send_ia_prompt(prompt,telefono_id,lang):
             {"role": "system", "content": f"Please always respond in '{lang}' language."}
             ]
         """
-
+        """
+        #version 2
         # Si ya hay historial, actualiza el primer mensaje si es de tipo 'system'
         if telefono_id in user_histories:
             # Reemplazar el primer system prompt (o agregar si no está)
@@ -239,6 +245,40 @@ def send_ia_prompt(prompt,telefono_id,lang):
                 {"role": "system", "content": f"Please always respond in '{lang}' language."}
                 ]
         
+        """
+
+        #version 3
+
+        """Actualiza el prompt e idioma del usuario, manteniendo su perfil fijo."""
+        # Obtiene perfil si existe
+        perfil = user_profiles.get(telefono_id, {})
+
+        # Si el idioma cambió o no hay historial → reinicia historial
+        if telefono_id not in user_histories or user_languages.get(telefono_id) != lang:
+            user_histories[telefono_id] = [
+                {"role": "system", "content": message_prompt},
+                {"role": "system", "content": f"Please always respond in '{lang}' language."},
+                {"role": "system", "content": f"User profile: {perfil}"}
+            ]
+            user_languages[telefono_id] = lang
+
+        else:
+            # Si el idioma no cambió → actualiza prompts en el historial existente
+            user_histories[telefono_id][0] = {"role": "system", "content": message_prompt} #carga el prompt
+
+            if len(user_histories[telefono_id]) > 1 and user_histories[telefono_id][1]['role'] == "system":
+                user_histories[telefono_id][1] = {"role": "system", "content": f"Please always respond in '{lang}' language."}
+            else:
+                user_histories[telefono_id].insert(1, {"role": "system", "content": f"Please always respond in '{lang}' language."})
+
+            # Actualiza o reinyecta el perfil si ya existe
+            if perfil:
+                if len(user_histories[telefono_id]) < 3 or user_histories[telefono_id][2]['role'] != "system":
+                    user_histories[telefono_id].append({"role": "system", "content": f"User profile: {perfil}"})
+                else:
+                    user_histories[telefono_id][2] = {"role": "system", "content": f"User profile: {perfil}"}
+
+
         logging.info(f"Consulta a la IA: {user_histories}")
     except Exception as e:
         logging.error(f"Error con la IA: {e}")
