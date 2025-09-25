@@ -404,28 +404,13 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         'agente': AGENTE_BOT
     }
 
-<<<<<<< HEAD
-
-    saludo_clave = ["hola","hi","hello","start","alo"]
-    portafolio_clave = ["portafolio","catálogo","servicios","productos","portfolio", "catalog", "services", "products"]
-    asesoria = ["asesor", "consultor", "consejero", "especialista", "orientador", "experto", "mentor","advisor", "consultant", "counselor", "specialist", "guide", "expert", "mentor"]
-=======
     portafolio_clave = ["portafolio","catalogo","servicios","productos"]
->>>>>>> parent of c415cd1 (acutalizacion portafolio 3)
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
-<<<<<<< HEAD
-    #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
-    if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
-        #user_language = "es"
-        user_language = actualizar_idioma_si_cambia(telefono_id, mensaje_recibido)
-
-=======
     if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
         user_language = "es"
->>>>>>> parent of c415cd1 (acutalizacion portafolio 3)
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     #elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
