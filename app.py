@@ -57,7 +57,7 @@ with app.app_context():
 # --- Recursos ---
 IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1747884690/imagen_index_wjog6p.jpg"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
-
+APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -236,7 +236,21 @@ def recibir_mensajes(req):
 
             if telefono_id and mensaje_texto:
 
-                chat_history = [{"role": "system", "content": mensaje_texto}]    
+                chat_history = [{"role": "system", "content": mensaje_texto}]
+
+                #___________________________________________________________________________
+                ##envio a zhoho
+                try:
+                    resp = req.post(
+                        APP_B_URL,
+                        json={"message": mensaje_recibido, "user_id": telefono_id},
+                        timeout=5
+                    )
+                    logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
+                except Exception as e:
+                    logging.error(f"❌ Error reenviando a App B: {e}")    
+                #___________________________________________________________________________
+
 
                 procesar_y_responder_mensaje(telefono_id, mensaje_texto)
             else:
@@ -248,6 +262,9 @@ def recibir_mensajes(req):
         return jsonify({'message': 'EVENT_RECEIVED_ERROR'}), 500
 
 def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
+
+
+
     """
     Procesa un mensaje recibido, determina el idioma del usuario y envía la respuesta adecuada.
     Registra el mensaje entrante y la respuesta en la base de datos y Google Sheets.
