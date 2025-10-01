@@ -240,15 +240,17 @@ def recibir_mensajes(req):
 
                 #___________________________________________________________________________
                 ##envio a zhoho
+                payload = {
+                        "message": mensaje_texto,
+                        "user_id": telefono_id,
+                        "tag": "soporte_urgente"   # 👈 nuevo campo opcional
+                    }
+
                 try:
-                    resp = requests.post(
-                        APP_B_URL,
-                        json={"message": mensaje_texto, "user_id": telefono_id},
-                        timeout=5
-                    )
+                    resp = requests.post(APP_B_URL, json=payload, timeout=5)
                     logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
                 except Exception as e:
-                    logging.error(f"❌ Error reenviando a App B: {e}")    
+                    logging.error(f"❌ Error reenviando a App B: {e}")  
                 #___________________________________________________________________________
 
 
