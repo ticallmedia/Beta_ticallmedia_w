@@ -2,7 +2,7 @@ from flask import Flask, request, json, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import http.client
-import logging
+import logging, requests
 import os
 from dotenv import load_dotenv
 import openai
@@ -241,9 +241,9 @@ def recibir_mensajes(req):
                 #___________________________________________________________________________
                 ##envio a zhoho
                 try:
-                    resp = req.post(
+                    resp = requests.post(
                         APP_B_URL,
-                        json={"message": mensaje_recibido, "user_id": telefono_id},
+                        json={"message": mensaje_texto, "user_id": telefono_id},
                         timeout=5
                     )
                     logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
