@@ -184,6 +184,24 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
         logging.error(f"Error con la IA: {e}")
+
+#___________________________________________________________________________
+#___________________________________________________________________________
+"""envio de mensajes a Zoho Sales IQ"""
+
+def send_zoho(telefono_id, mensaje_texto, tag):
+    payload = {
+            "message": mensaje_texto,
+            "user_id": telefono_id,
+            "tag": tag  # 👈 nuevo campo opcional
+        }
+
+    try:
+        resp = requests.post(APP_B_URL, json=payload, timeout=5)
+        logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
+    except Exception as e:
+        logging.error(f"❌ Error reenviando a App B: {e}")  
+#___________________________________________________________________________
 #_______________________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
 TOKEN_CODE = os.getenv('META_WHATSAPP_TOKEN_CODE')
@@ -239,18 +257,10 @@ def recibir_mensajes(req):
                 chat_history = [{"role": "system", "content": mensaje_texto}]
 
                 #___________________________________________________________________________
-                ##envio a zhoho
-                payload = {
-                        "message": mensaje_texto,
-                        "user_id": telefono_id,
-                        "tag": "soporte_urgente"   # 👈 nuevo campo opcional
-                    }
+                ##envio a Zoho Sales IQ
 
-                try:
-                    resp = requests.post(APP_B_URL, json=payload, timeout=5)
-                    logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
-                except Exception as e:
-                    logging.error(f"❌ Error reenviando a App B: {e}")  
+                send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
+
                 #___________________________________________________________________________
 
 
