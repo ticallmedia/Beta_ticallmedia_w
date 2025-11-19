@@ -187,7 +187,55 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
 
 #___________________________________________________________________________
 #___________________________________________________________________________
-"""envio de mensajes a Zoho Sales IQ"""
+"""
+Analiza el payload de la API de whatsapp y extrae el texto principal,
+este solo se utili para extraer el mensaje generado por el bot
+"""
+def extraer_texto_para_zoho(data):
+    try:
+        message_type = data.get("type")
+        texto_extraido = ""
+
+        if message_type == 'text':
+            texto_extraido = data.get('text',{}).get('body','')
+        
+        elif message_type == "image":
+            texto_extraido = data.get('image',{}).get('caption','[Imagen enviada]')
+
+        elif message_type == "interactive":
+            interactive_type = data.get('interactive',{}).get('type')
+
+            if interactive_type in ['button','list']:
+                texto_extraido = data.get('interactive',{}).get('body',{}).get('text','')
+        
+        #si no se encontro texto, devolver un placeholder para saber que se envio algo
+        if not texto_extraido:
+            return "[Mensjase interactivo o multimedia]"
+
+        return texto_extraido
+
+    except Exception as e:
+        logging.error(f"extraer_texto_para_zoho: error extrayendo texto para zoho: {e}")
+        return "[Error al procesar el mensaje para el bot]"
+
+"""
+Esta funcion registra primero en zoho y luego envia a whatsapp
+"""
+def enviar_respuesta_y_registrar_en_zoho(telefono_id, data):
+    #1. Extrae el mensaje de humanos para zoho
+    mensaje_para_zoho = extraer_texto_para_zoho(data)
+
+    #2. Envia a zzoho con una etiqueta para identificar los mensajes del bot
+    if mensaje_para_zoho:
+        logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
+        send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
+    
+    #3. Envia mensaje del bot a whatsapp
+    send_whatsapp_message(data)
+
+"""
+envio de mensajes a Zoho Sales IQ
+"""
 
 def send_zoho(telefono_id, mensaje_texto, tag):
     payload = {
@@ -201,6 +249,9 @@ def send_zoho(telefono_id, mensaje_texto, tag):
         logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
     except Exception as e:
         logging.error(f"❌ Error reenviando a App B: {e}")  
+
+
+
 #___________________________________________________________________________
 #_______________________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
@@ -490,7 +541,9 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
 
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_out),)).start()
 
-    send_whatsapp_message(data)
+    #send_whatsapp_message(data)
+    enviar_respuesta_y_registrar_en_zoho(telefono_id, data)
+
 
 # --- Ejecución del Programa ---
 if __name__ == '__main__':
