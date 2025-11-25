@@ -253,7 +253,7 @@ def send_zoho(telefono_id, mensaje_texto, tag):
 
 
 #___________________________________________________________________________
-#_______________________________________________________________________________________
+#___________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
 TOKEN_CODE = os.getenv('META_WHATSAPP_TOKEN_CODE')
 
@@ -544,7 +544,48 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
     #send_whatsapp_message(data)
     enviar_respuesta_y_registrar_en_zoho(telefono_id, data)
 
+#___________________________________________________________________________
+#___________________________________________________________________________
 
+@app.route('/api/envio_whatsapp', methods=['POST'])
+def send_whatsapp_from_middleware():
+    """
+    Recibe una petición de la App B (middleware) y envía el mensaje a WhatsApp.
+    """
+    try:
+        data = request.json
+        telefono_id = data.get("phone_number")
+        message_text = data.get("message")
+
+        if not telefono_id or not message_text:
+            logging.error("Petición a /api/send-whatsapp incompleta.")
+            return {"status": "error", "message": "Faltan phone_number o message"}, 400
+
+        # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
+
+        """
+        whatsapp_payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": telefono_id,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": message_text
+            }
+        }
+        """
+        # Llama a tu función existente para enviar el mensaje
+        #send_whatsapp_message(whatsapp_payload)
+        send_message_and_log(telefono_id, message_text, 'text')
+
+        return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
+
+    except Exception as e:
+        logging.error(f"Error en /api/senvio_whatsapp: {e}")
+        return {"status": "error", "message": "Error interno del servidor"}, 500
+#___________________________________________________________________________
+#___________________________________________________________________________
 # --- Ejecución del Programa ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
