@@ -566,11 +566,11 @@ def send_whatsapp_from_middleware():
         whatsapp_payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
-            "to": telefono_id,
+            "to": "573212240416",
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": message_text
+                "body": "PRUEBA MANUAL DE LA FUNCION"
             }
         }
 
