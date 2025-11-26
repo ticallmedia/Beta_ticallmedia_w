@@ -558,12 +558,11 @@ def send_whatsapp_from_middleware():
         message_text = data.get("message")
 
         if not telefono_id or not message_text:
-            logging.error("Petición a /api/send-whatsapp incompleta.")
+            logging.error("Petición a /api/envio_whatsapp incompleta.")
             return {"status": "error", "message": "Faltan phone_number o message"}, 400
 
         # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
 
-        """
         whatsapp_payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -574,15 +573,19 @@ def send_whatsapp_from_middleware():
                 "body": message_text
             }
         }
-        """
+
+        
+        logging.info(f"envio_whatsapp: Payload que se enviara a whatsapp: {whatsapp_payload}")
+
         # Llama a tu función existente para enviar el mensaje
-        #send_whatsapp_message(whatsapp_payload)
-        send_message_and_log(telefono_id, message_text, 'text')
+        send_whatsapp_message(whatsapp_payload)
+        
+        #send_message_and_log(telefono_id, message_text, 'text')
 
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
     except Exception as e:
-        logging.error(f"Error en /api/senvio_whatsapp: {e}")
+        logging.error(f"Error en /api/envio_whatsapp: {e}")
         return {"status": "error", "message": "Error interno del servidor"}, 500
 #___________________________________________________________________________
 #___________________________________________________________________________
