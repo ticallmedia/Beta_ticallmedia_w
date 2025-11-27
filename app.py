@@ -179,7 +179,7 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        send_message_and_log(telefono_id, respuesta_bot, 'text')
+        send_message_and_log(telefono_id, respuesta_bot, 'text', AGENTE_BOT ="Bot")
 
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
@@ -380,11 +380,11 @@ def send_initial_messages(telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
     # Saludo en el idioma elegido
     message_response = get_message(lang, "welcome_initial")
-    send_message_and_log(telefono_id, message_response, 'text')
+    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot")
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'image')
+    send_message_and_log(telefono_id, message_response, 'image', AGENTE_BOT="Bot")
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
@@ -406,7 +406,8 @@ def send_initial_messages(telefono_id, lang):
         message_response_for_buttons, 
         'button', 
         button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
-        button_ids=[si_id, no_id]           # Pasamos los IDs fijos
+        button_ids=[si_id, no_id],# Pasamos los IDs fijos
+        AGENTE_BOT= "Bot"
     )
 
 
@@ -428,16 +429,17 @@ def request1_messages(telefono_id, lang):
         list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
                       "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
                       "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
-                      "Atención personalizada"] # la descripcion  no debe superar 72 caracteres
+                      "Atención personalizada"], # la descripcion  no debe superar 72 caracteres
+        AGENTE_BOT = "Bot"
     )
 
 def send_adviser_messages(telefono_id, lang):
     """El usuario esta interesado y quiere concretar una cita"""
     message_response = get_message(lang, "agent")
-    send_message_and_log(telefono_id, message_response, 'text')
+    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot")
 
 
-def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
+def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -563,6 +565,7 @@ def send_whatsapp_from_middleware():
 
         # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
 
+        """
         whatsapp_payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -576,11 +579,12 @@ def send_whatsapp_from_middleware():
 
         
         logging.info(f"envio_whatsapp: Payload que se enviara a whatsapp: {whatsapp_payload}")
+        """
 
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
         
-        send_message_and_log(telefono_id, message_text, 'text')
+        send_message_and_log(telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
 
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
