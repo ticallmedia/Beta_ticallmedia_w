@@ -578,9 +578,9 @@ def send_whatsapp_from_middleware():
         logging.info(f"envio_whatsapp: Payload que se enviara a whatsapp: {whatsapp_payload}")
 
         # Llama a tu función existente para enviar el mensaje
-        send_whatsapp_message(whatsapp_payload)
+        #send_whatsapp_message(whatsapp_payload)
         
-        #send_message_and_log(telefono_id, message_text, 'text')
+        send_message_and_log(telefono_id, message_text, 'text')
 
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
