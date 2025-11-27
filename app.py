@@ -334,14 +334,15 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     """
     mensaje_procesado = mensaje_recibido.lower()
     user_language = ""
-    
+    AGENTE_BOT = "Usuario"
+
     # Primero, registra el mensaje entrante
     log_data_in = {
         'telefono_usuario_id': telefono_id,
         'plataforma': 'whatsapp 📞📱💬',
         'mensaje': mensaje_recibido,
         'estado_usuario': 'recibido',
-        'etiqueta_campana': 'Vacaciones',
+        'etiqueta_campana': 'Interesado',
         'agente': AGENTE_BOT
     }
 
