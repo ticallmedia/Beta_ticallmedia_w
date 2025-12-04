@@ -55,7 +55,7 @@ with app.app_context():
 #_______________________________________________________________________________________
 
 # --- Recursos ---
-IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1747884690/imagen_index_wjog6p.jpg"
+IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1764819215/Image_dnlh2ldnlh2ldnlh_navidad_e1ler4.png"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
 APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
 #_______________________________________________________________________________________
