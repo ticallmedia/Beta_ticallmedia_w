@@ -189,7 +189,7 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
 #___________________________________________________________________________
 """
 Analiza el payload de la API de whatsapp y extrae el texto principal,
-este solo se utili para extraer el mensaje generado por el bot
+este solo se util para extraer el mensaje generado por el bot
 """
 def extraer_texto_para_zoho(data):
     try:
@@ -225,7 +225,7 @@ def enviar_respuesta_y_registrar_en_zoho(telefono_id, data):
     #1. Extrae el mensaje de humanos para zoho
     mensaje_para_zoho = extraer_texto_para_zoho(data)
 
-    #2. Envia a zzoho con una etiqueta para identificar los mensajes del bot
+    #2. Envia a zoho con una etiqueta para identificar los mensajes del bot
     if mensaje_para_zoho:
         logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
         send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
@@ -307,15 +307,16 @@ def recibir_mensajes(req):
 
                 chat_history = [{"role": "system", "content": mensaje_texto}]
 
+                AGENTE_BOT = "Usuario"
                 #___________________________________________________________________________
                 ##envio a Zoho Sales IQ
 
-                send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
+                #send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
 
                 #___________________________________________________________________________
 
 
-                procesar_y_responder_mensaje(telefono_id, mensaje_texto)
+                procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
             else:
                 logging.info("Mensaje no procesable (sin ID de teléfono o texto de mensaje).")
         
@@ -324,7 +325,7 @@ def recibir_mensajes(req):
         logging.error(f"Error en recibir_mensajes: {e}")
         return jsonify({'message': 'EVENT_RECEIVED_ERROR'}), 500
 
-def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
+def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
 
 
 
@@ -334,7 +335,6 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     """
     mensaje_procesado = mensaje_recibido.lower()
     user_language = ""
-    AGENTE_BOT = "Usuario"
 
     # Primero, registra el mensaje entrante
     log_data_in = {
@@ -371,9 +371,12 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
     else:
-        user_language = "es"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
+        if AGENTE_BOT == "Agente Humano":
+            send_zoho(telefono_id, mensaje_procesado, "soporte_urgente" )
+        else:
+            user_language = "es"
+            chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+            send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
 
 
 
@@ -564,7 +567,6 @@ def send_whatsapp_from_middleware():
             logging.error("Petición a /api/envio_whatsapp incompleta.")
             return {"status": "error", "message": "Faltan phone_number o message"}, 400
 
-        # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
 
         """
         whatsapp_payload = {
