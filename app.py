@@ -57,7 +57,7 @@ with app.app_context():
 # --- Recursos ---
 IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1764819215/Image_dnlh2ldnlh2ldnlh_navidad_e1ler4.png"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
-IA = "Si" #Constante para evitar consumo innesario de la IA
+sender_role = "Bot" #Constante para evitar consumo innesario de la IA
 APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
@@ -180,7 +180,7 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        send_message_and_log(telefono_id, respuesta_bot, 'text', AGENTE_BOT ="Bot", IA = "Si")
+        send_message_and_log(telefono_id, respuesta_bot, 'text', AGENTE_BOT ="Bot")
 
         logging.info(f"Consulta a la IA: {respuesta_bot}")
     except Exception as e:
@@ -312,7 +312,7 @@ def recibir_mensajes(req):
                 #___________________________________________________________________________
                 ##envio a Zoho Sales IQ
 
-                #send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
+                send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
 
                 #___________________________________________________________________________
 
@@ -372,9 +372,10 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
     else:
-        if IA == "No" :
+        if sender_role == "human_agent" :
             #send_zoho(telefono_id, mensaje_procesado, "soporte_urgente" )
-            send_message_and_log(telefono_id, mensaje_procesado, 'text', AGENTE_BOT, IA)
+            logging.info(f"Desactiva IA: {sender_role}")
+            send_message_and_log(telefono_id, mensaje_procesado, 'text', AGENTE_BOT)
         else:
             user_language = "es"
             chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
@@ -386,11 +387,11 @@ def send_initial_messages(telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
     # Saludo en el idioma elegido
     message_response = get_message(lang, "welcome_initial")
-    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot", IA ="Si")
+    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot")
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'image', AGENTE_BOT="Bot", IA ="Si")
+    send_message_and_log(telefono_id, message_response, 'image', AGENTE_BOT="Bot")
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
@@ -413,8 +414,7 @@ def send_initial_messages(telefono_id, lang):
         'button', 
         button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
         button_ids=[si_id, no_id],# Pasamos los IDs fijos
-        AGENTE_BOT= "Bot",
-        IA ="Si"
+        AGENTE_BOT= "Bot"
     )
 
 
@@ -437,17 +437,16 @@ def request1_messages(telefono_id, lang):
                       "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
                       "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
                       "Atención personalizada"], # la descripcion  no debe superar 72 caracteres
-        AGENTE_BOT = "Bot",
-        IA ="Si"
+        AGENTE_BOT = "Bot"
     )
 
 def send_adviser_messages(telefono_id, lang):
     """El usuario esta interesado y quiere concretar una cita"""
     message_response = get_message(lang, "agent")
-    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot", IA ="Si")
+    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT="Bot")
 
 
-def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None, IA =None):
+def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -566,6 +565,7 @@ def send_whatsapp_from_middleware():
         data = request.json
         telefono_id = data.get("phone_number")
         message_text = data.get("message")
+        sender_role = data.get("human_agent")
 
         if not telefono_id or not message_text:
             logging.error("Petición a /api/envio_whatsapp incompleta.")
@@ -591,7 +591,7 @@ def send_whatsapp_from_middleware():
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
         
-        send_message_and_log(telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano", IA = "No" )
+        send_message_and_log(telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
 
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
