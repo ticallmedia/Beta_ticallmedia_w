@@ -372,7 +372,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
     else:
         if AGENTE_BOT == "Agente Humano":
-            send_zoho(telefono_id, mensaje_procesado, "soporte_urgente" )
+            #send_zoho(telefono_id, mensaje_procesado, "soporte_urgente" )
+            send_message_and_log(telefono_id, mensaje_procesado, 'text', AGENTE_BOT)
         else:
             user_language = "es"
             chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
