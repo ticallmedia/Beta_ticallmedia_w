@@ -57,6 +57,7 @@ with app.app_context():
 # --- Recursos ---
 IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1764819215/Image_dnlh2ldnlh2ldnlh_navidad_e1ler4.png"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
+IA = "Si" #Constante para evitar consumo innesario de la IA
 APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
@@ -371,7 +372,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         send_ia_message(telefono_id, mensaje_procesado, chat_history, user_language)
     else:
-        if AGENTE_BOT == "Agente Humano":
+        if IA == "No" :
             #send_zoho(telefono_id, mensaje_procesado, "soporte_urgente" )
             send_message_and_log(telefono_id, mensaje_procesado, 'text', AGENTE_BOT)
         else:
@@ -587,7 +588,7 @@ def send_whatsapp_from_middleware():
 
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
-        
+        IA = "No"
         send_message_and_log(telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
 
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
