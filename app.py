@@ -58,7 +58,7 @@ with app.app_context():
 #_______________________________________________________________________________________
 
 # --- Recursos ---
-IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1747884690/imagen_index_wjog6p.jpg"
+IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1764819215/Image_dnlh2ldnlh2ldnlh_navidad_e1ler4.png"
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
 sender_role = "Bot" #Constante para evitar consumo innesario de la IA
 APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
@@ -345,7 +345,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         'plataforma': 'whatsapp 📞📱💬',
         'mensaje': mensaje_recibido,
         'estado_usuario': 'recibido',
-        'etiqueta_campana': 'Vacaciones',
+        'etiqueta_campana': 'Interesado',
         'agente': AGENTE_BOT
     }
 
