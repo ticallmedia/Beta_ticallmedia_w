@@ -225,11 +225,15 @@ def extraer_texto_para_zoho(data):
 """
 Esta funcion registra primero en zoho y luego envia a whatsapp
 """
-def enviar_respuesta_y_registrar_en_zoho(telefono_id, data):
+def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
     #1. Extrae el mensaje de humanos para zoho
     mensaje_para_zoho = extraer_texto_para_zoho(data)
 
-    #2. Envia a zzoho con una etiqueta para identificar los mensajes del bot
+    #2. Envia a zoho con una etiqueta para identificar los mensajes del bot
+    if "Agente Humano" in AGENTE_BOT: #se agrega if para impedir que se reescriba informacion en zoho cuando habla el agente humano
+        logging.info(f"Mensaje de (ECO) ignorado...") 
+        return "OK", 200
+
     if mensaje_para_zoho:
         logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
         send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
@@ -558,7 +562,7 @@ def send_message_and_log(telefono_id, message_text, message_type='text', button_
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_out),)).start()
 
     #send_whatsapp_message(data)
-    enviar_respuesta_y_registrar_en_zoho(telefono_id, data)
+    enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT)
 
 #___________________________________________________________________________
 #___________________________________________________________________________
