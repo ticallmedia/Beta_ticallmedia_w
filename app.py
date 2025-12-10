@@ -292,6 +292,16 @@ def recibir_mensajes(req):
         value = changes.get('value', {})
         objeto_mensaje = value.get('messages', [])
 
+
+        #comprobacion: si el payload contines 'statuses' y no 'messages'
+        #significa que es una notificacion de  (entregado, leido etc), de los mensajes enviados
+        #se agrega para evitar el ECO de zoho
+
+        if "statuses" in changes:
+            logging.info("webhook de estado de mensaje (ECO) recibido. Ingorado...")
+            return "OK", 200
+
+
         if objeto_mensaje:
             message = objeto_mensaje[0]
             telefono_id = message.get('from')
