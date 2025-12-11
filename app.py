@@ -58,10 +58,10 @@ with app.app_context():
 #_______________________________________________________________________________________
 
 # --- Recursos ---
-IMA_SALUDO_URL = "https://res.cloudinary.com/dioy4cydg/image/upload/v1764819215/Image_dnlh2ldnlh2ldnlh_navidad_e1ler4.png"
+
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
-sender_role = "Bot" #Constante para evitar consumo innesario de la IA
-APP_B_URL = "https://api-middleware-zoho.onrender.com/api/from-waba"
+IMA_SALUDO_URL = os.getenv("IMA_SALUDO_URL")
+APP_B_URL = os.getenv("APP_B_URL")
 #_______________________________________________________________________________________
 # --- Funciones de la Aplicación Flask ---
 @app.route('/')
@@ -183,7 +183,7 @@ def send_ia_message(telefono_id, message_text, chat_history_prompt, lang):
         # Agregar respuesta del bot al historial
         chat_history.append({"role": "assistant", "content": respuesta_bot})
 
-        send_message_and_log(telefono_id, respuesta_bot, 'text')
+        send_message_and_log(telefono_id, respuesta_bot, 'text', AGENTE_BOT = "Bot")
 
         logging.info(f"send_ia_message: Consulta a la IA: {respuesta_bot}")
     except Exception as e:
@@ -453,7 +453,7 @@ def request1_messages(telefono_id, lang):
 def send_adviser_messages(telefono_id, lang):
     """El usuario esta interesado y quiere concretar una cita"""
     message_response = get_message(lang, "agent")
-    send_message_and_log(telefono_id, message_response, 'text')
+    send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT = "Bot")
 
 
 def send_message_and_log(telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None):
