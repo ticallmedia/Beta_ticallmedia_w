@@ -113,12 +113,12 @@ class ConversationManager:
         self.memory_cache = {}
         self.cache_lock = Lock()
 
-    def get_history(self, telefono_id):
+    def get_history(self, telefono_id, prompt):
         """Obtiene historial desde BD con cache"""
         with self.cache_lock:
             #1. Revisa cache primero
             if telefono_id in self.memory_cache:
-                logging.info(f"get_history: Hisotrial obtenido de cache para {telefono_id}")
+                logging.info(f"get_history: Historial obtenido de cache para {telefono_id}")
                 return self.memory_cache[telefono_id]
             
             #2. Si no esta en cache, consulta BD
@@ -131,7 +131,7 @@ class ConversationManager:
                 logging.info(f"get_history: Historial obtenido de la BD para {telefono_id}")
             else:
                 #3. Inicializar con prompt del sistema
-                history = self._init_system_prompt(telefono_id)
+                history = self._init_system_prompt(telefono_id, prompt)
                 logging.info(f"get_history: Nuevo historial creado {telefono_id}")
             
             #4. Guarda cache
@@ -139,7 +139,7 @@ class ConversationManager:
             return history
     
     def save_history(self, telefono_id, history):
-        """Guarda historial en BD y actauliza cache"""
+        """Guarda historial en BD y actualiza cache"""
         with self.cache_lock:
             try:
                 conversation = ConversationHistory.query.filter_by(
@@ -231,7 +231,7 @@ conversation_manager = ConversationManager()
 def send_ia_prompt(prompt, telefono_id):
     """Inicializa o actualiza el prompt del sistema, retorna el historial real desde el manager"""
     try:
-        history = conversation_manager.get_history(telefono_id)
+        history = conversation_manager.get_history(telefono_id, prompt)
 
         if history and history[0]["role"] =="system":
             message_prompt = get_message("en", prompt)
