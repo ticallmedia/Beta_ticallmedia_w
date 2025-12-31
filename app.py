@@ -113,8 +113,11 @@ class ConversationManager:
         self.memory_cache = {}
         self.cache_lock = Lock()
 
-    def get_history(self, telefono_id, prompt):
-        """Obtiene historial desde BD con cache"""
+    def get_history(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
+        """
+            Obtiene historial desde BD con cache
+            Si no existe, lo inicializa automáticamente con el prompt del sistema.
+        """
         with self.cache_lock:
             #1. Revisa cache primero
             if telefono_id in self.memory_cache:
@@ -131,8 +134,8 @@ class ConversationManager:
                 logging.info(f"get_history: Historial obtenido de la BD para {telefono_id}")
             else:
                 #3. Inicializar con prompt del sistema
-                history = self._init_system_prompt(telefono_id, prompt)
-                logging.info(f"get_history: Nuevo historial creado {telefono_id}")
+                history = self._init_system_prompt(telefono_id, lang, prompt_type)
+                logging.info(f"get_history: Nuevo historial creado {telefono_id} - lang: {lang}, Tipo: {prompt_type}")
             
             #4. Guarda cache
             self.memory_cache[telefono_id] = history
@@ -165,16 +168,44 @@ class ConversationManager:
                 logging.error(f"save_history: Error guardando historial para {telefono_id}: {e}")
                 raise
 
-    def _init_system_prompt(self, telefono_id, prompt):
+    def _init_system_prompt(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
         """Inicializa conversación con prompt del sistema"""
         try:
-            message_prompt = get_message("en", prompt)
+            message_prompt = get_message(lang, prompt_type)
             logging.info(f"_init_system_prompt: incia con el prompt IA")
             return [{"role": "system", "content": message_prompt}]
         except Exception as e:
-            logging.error(f"_init_system_prompt:Error inicializando prompt IA: {e}")
+            logging.error(f"_init_system_prompt: Error inicializando prompt IA: {telefono_id}: {e}")
             return [{"role": "system", "content": message_prompt}]
+
+    def update_system_prompt(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
+        """
+        Actualiza el prompt del sistema para un usuario existente.
+        Útil cuando quieres cambiar entre prompt_ia_yes y prompt_ia_no.
         
+        Args:
+            telefono_id: ID del teléfono del usuario
+            lang: Idioma ("es" o "en")
+            prompt_type: Tipo de prompt ("prompt_ia_yes" o "prompt_ia_no")
+        """
+        with self.cache_lock:
+            try:
+                history = self.get_history(telefono_id, lang, prompt_type)
+                
+                # Actualizar el primer mensaje (system prompt)
+                if history and history[0]["role"] == "system":
+                    # Cargar nuevo prompt desde prompt_ia.py
+                    message_prompt = get_message(lang, prompt_type)
+                    history[0]["content"] = message_prompt
+                    self.save_history(telefono_id, history)
+                    logging.info(f"Prompt actualizado para {telefono_id} - Lang: {lang}, Tipo: {prompt_type}")
+                    return True
+                return False
+                
+            except Exception as e:
+                logging.error(f"Error actualizando prompt para {telefono_id}: {e}")
+                return False
+                
     def clear_history(self, telefono_id):
         """Limpia historial de un suario especifico"""
         with self.cache_lock:
@@ -227,9 +258,9 @@ conversation_manager = ConversationManager()
 
 #_______________________________________________________________________________________
 #6. FUNCIONES DE IA
-
+"""
 def send_ia_prompt(prompt, telefono_id):
-    """Inicializa o actualiza el prompt del sistema, retorna el historial real desde el manager"""
+    Inicializa o actualiza el prompt del sistema, retorna el historial real desde el manager
     try:
         history = conversation_manager.get_history(telefono_id, prompt)
 
@@ -240,9 +271,9 @@ def send_ia_prompt(prompt, telefono_id):
 
     except Exception as e:
         logging.error(f"send_ia_prompt: Error para {telefono_id}: {e}")
+"""
 
-
-def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang):
+def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt_type="prompt_ia_yes"):
     """Gestiona la conversacion con la IA usando persistencia en  BD"""
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -255,7 +286,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang):
 
     try:
         # 2. Obtiene el hisotiral desde manager (cache + BD) 
-        chat_history = conversation_manager.get_history(telefono_id)
+        chat_history = conversation_manager.get_history(telefono_id, lang, prompt_type)
 
         if not chat_history:
             logging.error(f"send_ia_message: No se puede obtener historial para {telefono_id}")
@@ -535,7 +566,7 @@ def recibir_mensajes(req):
 
             if telefono_id and mensaje_texto:
 
-                chat_history = [{"role": "system", "content": mensaje_texto}]    
+                #chat_history = [{"role": "system", "content": mensaje_texto}]    
 
                 procesar_y_responder_mensaje(telefono_id, mensaje_texto)
             else:
@@ -582,29 +613,67 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
         user_language = "en"
-        ESTADO_USUARIO = "no_interesado"
-        chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
-        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        #ESTADO_USUARIO = "no_interesado"
+        #chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        prompt_type  = "prompt_ia_no"
+
+        send_ia_message(
+            ESTADO_USUARIO="no_interesado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=user_language,
+            prompt_type=prompt_type
+            )
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
         user_language = "en"
-        ESTADO_USUARIO = "interesado"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        #ESTADO_USUARIO = "interesado"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        prompt_type  = "prompt_ia_yes"
+
+        send_ia_message(
+            ESTADO_USUARIO="interesado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=user_language,
+            prompt_type=prompt_type
+            )
+        
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
         user_language = "en"
         ESTADO_USUARIO = "quiere_asesor"
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         user_language = "en"
-        ESTADO_USUARIO = "calificado"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        #ESTADO_USUARIO = "calificado"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        prompt_type  = "prompt_ia_yes"
+
+        send_ia_message(
+            ESTADO_USUARIO="calificado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=user_language,
+            prompt_type=prompt_type
+            )
     else:
         user_language = "en"
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
-        ESTADO_USUARIO = "neutro"
-        chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-        send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        #ESTADO_USUARIO = "neutro"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
+        
+        prompt_type  = "prompt_ia_yes"
+
+        send_ia_message(
+            ESTADO_USUARIO="neutro",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=user_language,
+            prompt_type=prompt_type
+            )
 
 
 
@@ -678,8 +747,18 @@ def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
 
     #message_response = get_message(lang, "agent")
     #send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
-    chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
-    send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
+    #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+    #send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
+    
+    prompt_type  = "prompt_ia_yes"
+
+    send_ia_message(
+        ESTADO_USUARIO=ESTADO_USUARIO,
+        telefono_id=telefono_id,
+        message_text=mensaje_procesado,
+        lang=lang,
+        prompt_type=prompt_type
+        )
 
 
 def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
