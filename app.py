@@ -421,7 +421,12 @@ def index():
     registros_ordenados = sorted(registros, key=lambda x: x.fecha_y_hora, reverse=True)
     return render_template('index.html', registros=registros_ordenados)
 
-
+@app.route('/historyia')
+def history_temp():
+    """Muestra el historial temporal de las interesacciones con la IA"""
+    registros_ia = ConversationHistory.query.all()
+    registros_ia_ordenados = sorted(registros_ia, key=lambda x: x.created_at, reverse=True)
+    return render_template('history_temp.html', registros_ia= registros_ia_ordenados )
 
 """"Función para cargar o actualizar prompt de la IA, y mantener el hilo de
 conversación con un usuario"""

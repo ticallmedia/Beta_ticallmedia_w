@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>TicAll Media</title>
+        <style>
+            table {
+                width: 80%;
+                border-collapse: collapse ;
+                margin: 20px;
+            }
+            th, td{
+                border: 1px solid #ddd;
+                padding: 3px;
+                text-align: left;
+            }
+            th{
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>BETA TicAll Media, historial temproal de IA</h1>
+
+        <table>
+            <tr>
+                <td>ID</td>
+                <td>Telefono - Usuario ID</td>
+                <td>History</td>
+                <td>Fecha de Actualizacion</td>
+                <td>Fecha de Creacion</td>
+            </tr>
+            {% for registro in registros_ia %}
+            <tr>
+                <td>{{ registro.id }}</td>
+                <td>{{ registro.telefono_usuario_id }}</td>
+                <td>{{ registro.history }}</td>
+                <td>{{ registro.updated_at }}</td>
+                <td>{{ registro.created_at }}</td>
+            </tr>            
+            {% endfor %}
+        </table>
+    </body>
+</html>
