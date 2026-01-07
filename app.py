@@ -265,8 +265,8 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     
     # 1. Solicitudes de portafolio en medio de la conversacion 
-    if message_text.lower() in ["portfolio", "view services", "show options", "services",
-                                  "portafolio", "ver servicios", "mostrar opciones", "servicios"]:
+    if message_text.lower() in ["portfolio", "view services", "show options",
+                                  "portafolio", "ver servicios", "mostrar opciones"]:
         request1_messages(telefono_id, lang)
         return
 
@@ -528,24 +528,24 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     }
 
     saludo_clave = ["hola","hi","hello","start","alo"]
-    portafolio_clave = ["portfolio", "view services", "show options", "services",
-                        "portafolio", "ver servicios", "mostrar opciones", "servicios"]
+    portafolio_clave = ["portfolio", "view services", "show options",
+                        "portafolio", "ver servicios", "mostrar opciones"]
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
     #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
-        user_language = "es"
+        user_language = "en"
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, user_language)        
     #elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
-        user_language = "es"
+        user_language = "en"
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, user_language)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
-        user_language = "es"
+        user_language = "en"
         #ESTADO_USUARIO = "no_interesado"
         #chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
@@ -559,7 +559,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             prompt_type=prompt_type
             )
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
-        user_language = "es"
+        user_language = "en"
         #ESTADO_USUARIO = "interesado"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
@@ -574,11 +574,11 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             )
         
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
-        user_language = "es"
+        user_language = "en"
         ESTADO_USUARIO = "quiere_asesor"
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  user_language)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
-        user_language = "es"
+        user_language = "en"
         #ESTADO_USUARIO = "calificado"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, user_language)
@@ -592,7 +592,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             prompt_type=prompt_type
             )
     else:
-        user_language = "es"
+        user_language = "en"
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         #ESTADO_USUARIO = "neutro"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
