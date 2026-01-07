@@ -258,20 +258,6 @@ conversation_manager = ConversationManager()
 
 #_______________________________________________________________________________________
 #6. FUNCIONES DE IA
-"""
-def send_ia_prompt(prompt, telefono_id):
-    Inicializa o actualiza el prompt del sistema, retorna el historial real desde el manager
-    try:
-        history = conversation_manager.get_history(telefono_id, prompt)
-
-        if history and history[0]["role"] =="system":
-            message_prompt = get_message("en", prompt)
-            history[0]["content"] = message_prompt
-            conversation_manager.save_history(telefono_id, history)
-
-    except Exception as e:
-        logging.error(f"send_ia_prompt: Error para {telefono_id}: {e}")
-"""
 
 def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt_type="prompt_ia_yes"):
     """Gestiona la conversacion con la IA usando persistencia en  BD"""
@@ -371,22 +357,6 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
             db.session.rollback() # Si hay un error, revertir la transacción
             logging.error(f"Error añadiendo log a DB (hilo): {e}")
 
-"""
-def agregar_mensajes_log(datos_json):
-    Agrega un registro de mensaje a la base de datos.
-    datos = json.loads(datos_json)
-    nuevo_registro = Log(
-        telefono_usuario_id=datos.get('telefono_usuario_id'),
-        plataforma=datos.get('plataforma'),
-        mensaje=datos.get('mensaje'),
-        estado_usuario=datos.get('estado_usuario'),
-        etiqueta_campana=datos.get('etiqueta_campana'),
-        agente=datos.get('agente')
-    )
-    db.session.add(nuevo_registro)
-    db.session.commit()
-
-"""
 #_______________________________________________________________________________________
 #8. API WHATSAPP
 # --- API WhatsApp para el envío de mensajes ---
