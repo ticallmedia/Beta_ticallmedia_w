@@ -298,7 +298,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt
         # 4. Limitar histortial para evitar exceder tokens
         MAX_MESSAGES = 20
         if len(chat_history) > MAX_MESSAGES + 1:
-            chat_history = chat_history[0] + chat_history[-(MAX_MESSAGES):]
+            chat_history = [chat_history[0]] + chat_history[-(MAX_MESSAGES):]
 
         # 5. Llamar a OPENIA
         response = openai.ChatCompletion.create(
@@ -428,66 +428,6 @@ def history_temp():
     registros_ia_ordenados = sorted(registros_ia, key=lambda x: x.created_at, reverse=True)
     return render_template('history_temp.html', registros_ia= registros_ia_ordenados )
 
-""""Función para cargar o actualizar prompt de la IA, y mantener el hilo de
-conversación con un usuario"""
-
-"""
-user_histories = {}
-
-def send_ia_prompt(prompt,telefono_id):
-    try:
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
-        message_prompt = get_message("en", prompt)
-
-        if telefono_id not in user_histories:
-            user_histories[telefono_id] = [{"role": "system", "content": message_prompt}]
-        
-        logging.info(f"Consulta a la IA: {user_histories}")
-    except Exception as e:
-        logging.error(f"Error con la IA: {e}")
-
-    return list(user_histories[telefono_id])
-"""
-"""Función que mantenie el flujo de la conversación de la IA"""
-"""
-def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, chat_history_prompt, lang):
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-    
-    # 1. Si el usuario solicita ver el portafolio
-    #if message_text in ["portafolio", "ver servicios", "mostrar opciones", "servicios"]:
-    if message_text in ["Portfolio","View Services","Show Options","Services"]:
-        request1_messages(telefono_id, lang)
-        return
-
-    # 2. Cargar historial si ya existe o iniciarlo con prompt
-    if telefono_id not in user_histories:
-        user_histories[telefono_id] = chat_history_prompt
-
-    chat_history = user_histories[telefono_id]
-    
-    # Agregar el mensaje del usuario al historial
-    chat_history.append({"role": "user", "content": message_text})
-
-    try:
-        # Solicitar respuesta a OpenAI
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini", #"gpt-3.5-turbo",
-            messages=chat_history
-        )
-
-        # Obtener la respuesta del asistente
-        respuesta_bot = response['choices'][0]['message']['content']
-        #print(f"Asistente: {respuesta_bot}\n")
-
-        # Agregar respuesta del bot al historial
-        chat_history.append({"role": "assistant", "content": respuesta_bot})
-
-        send_message_and_log(ESTADO_USUARIO,telefono_id, respuesta_bot, 'text')
-
-        logging.info(f"Consulta a la IA: {respuesta_bot}")
-    except Exception as e:
-        logging.error(f"Error con la IA: {e}")
-        """
 
 @app.route('/clear_history/<telefono_id>', methods=['GET','POST'])
 def clear_user_history(telefono_id):
@@ -496,7 +436,11 @@ def clear_user_history(telefono_id):
         conversation_manager.clear_history(telefono_id)
 
         if request.method == 'GET':
-            return render_template('erase_history.html', telefono_id = telefono_id, mensaje ='El Historial de conversacion ha sido eliminado exitosamente, para: ' ), 200
+            return render_template(
+                'erase_history.html', 
+                telefono_id = telefono_id, 
+                mensaje ='El Historial de conversacion ha sido eliminado exitosamente, para: ' 
+                ), 200
         
         # Si es POST (API), retornar JSON
         return jsonify({
@@ -506,7 +450,11 @@ def clear_user_history(telefono_id):
     except Exception as e:
 
         if request.method == 'GET':
-            return render_template('erase_history.html', telefono_id = telefono_id, mensaje ='No se pudo limpiar el historial: ' ), 500
+            return render_template(
+                'erase_history.html', 
+                telefono_id = telefono_id, 
+                mensaje ='No se pudo limpiar el historial: ' 
+                ), 500
         
         return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -610,7 +558,8 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     }
 
     saludo_clave = ["hola","hi","hello","start","alo"]
-    portafolio_clave = ["portafolio","catálogo","servicios","productos"]
+    portafolio_clave = ["portfolio", "view services", "show options", "services",
+                        "portafolio", "ver servicios", "mostrar opciones", "servicios"]
 
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
