@@ -820,7 +820,7 @@ def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type=
             "interactive": {
                 "type": "list",
                 "body": {"text": message_text},
-                "footer": {"text": get_message("en", "list_footer_text")},
+                "footer": {"text": get_message("es", "list_footer_text")},
                 "action": {
                     "button": "Portfolio",
                     "sections": [
