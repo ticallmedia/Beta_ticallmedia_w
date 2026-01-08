@@ -293,13 +293,14 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="es", promp
             logging.info(f"send_ia_message: Historial recortado para {telefono_id} - {len(chat_history)} mensajes")
 
         # 5. Llamar a OPENIA
-        """
+        
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini", #"gpt-3.5-turbo",
             messages=chat_history,
             temperature=0.7,
             max_tokens=500
         )
+        
         """
         # 5. CRÍTICO: Calcular tokens y ajustar max_tokens dinámicamente
         chars_per_token = 4 if lang == "es" else 5
@@ -317,7 +318,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="es", promp
         logging.info(f"send_ia_message: Tokens estimados entrada={estimated_input_tokens}, max_salida={max_output_tokens}")
 
         # 6. Configuración optimizada para GPT-4o-mini
-        """
+        
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
             messages=chat_history,
@@ -331,13 +332,15 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="es", promp
         chat_history.pop()
         chat_history.pop()
         """
+        
+        """
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini", #"gpt-3.5-turbo",
             messages=chat_history,
             temperature=0.7,
             max_tokens=max_output_tokens
         )
-
+        """
 
         # 8. Detectar si la respuesta fue truncada
 
