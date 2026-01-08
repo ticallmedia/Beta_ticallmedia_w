@@ -285,13 +285,14 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="es", promp
 
         # 4. Limitar histortial para evitar exceder tokens
         MAX_MESSAGES = 30
-        #if len(chat_history) > MAX_MESSAGES + 1:
-        #    chat_history = [chat_history[0]] + chat_history[-(MAX_MESSAGES):]
+        if len(chat_history) > MAX_MESSAGES + 1:
+            chat_history = [chat_history[0]] + chat_history[-(MAX_MESSAGES):]
 
+        """
         if len(chat_history) > MAX_MESSAGES + 1:
             chat_history = [chat_history[0]] + chat_history[1:6] + chat_history[-(MAX_MESSAGES-5):]
             logging.info(f"send_ia_message: Historial recortado para {telefono_id} - {len(chat_history)} mensajes")
-
+        """
         # 5. Llamar a OPENIA
         
         response = openai.ChatCompletion.create(
@@ -332,7 +333,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="es", promp
         chat_history.pop()
         chat_history.pop()
         """
-        
+
         """
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini", #"gpt-3.5-turbo",
