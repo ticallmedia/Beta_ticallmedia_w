@@ -1,14 +1,14 @@
 MESSAGES = {
     "es": {
-        "welcome_initial": "👋😊!Hola¡ Bienvenido a TicAll Media.",
+        "welcome_initial": "👋😊!Hola¡ Bienvenido a EMPRESA.",
         "greeting_text1": "¡Saludos! 🤖 ¿Intrigado por una estrategia de marketing más inteligente?",
-        "greeting_text2": "En TicAll Media, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
+        "greeting_text2": "En EMPRESA, tenemos ideas que podrían sorprenderte.\n\n¿Te animas a explorar?",
         "portafolio": "🚀 ¿Buscas asesoría sobre algún servicio especial?\n",
         "list_footer_text":"Elige una de las opciones para poder ayudarte 📌:",
         "list_button_text": "Ver Portafolio",
         "agent": "Un momento, por favor. ⏳ Estamos conectándote con uno de nuestros asesores. ¡Pronto estaremos contigo! 😊",
         "prompt_ia_yes": (
-            "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
+            "¡Hola! 👋 Soy el asistente virtual de EMPRESA 😊. Estoy aquí para ayudarte a solicitar uno de nuestros servicios digitales. "
             "Te atenderé con alegría, respeto y muchos emoticones para hacer esta experiencia más agradable 😄✨.\n\n"
 
             "Para comenzar, te pediré tu nombre completo para poder dirigirme a ti de forma más cercana. "
@@ -38,14 +38,14 @@ MESSAGES = {
             "📧 Correo electrónico de contacto\n"
             "📱 Confirmar si este es su número de WhatsApp o indicar uno diferente\n"
             "📝 Una breve descripción de su negocio o necesidad\n"
-            "🔒 Informar que al continuar, autoriza el tratamiento de sus datos personales según nuestra política de privacidad en https://ticallmedia.com/terms-and-conditions\n"
+            "🔒 Informar que al continuar, autoriza el tratamiento de sus datos personales según nuestra política de privacidad en https://EMPRESA.com/terms-and-conditions\n"
             "🔞 Confirmar si es mayor de 18 años\n\n"
 
             "✅ Validaré que los datos tengan un formato correcto (por ejemplo, que el correo contenga '@' y que el número sea válido). "
             "Siempre responderé con amabilidad y profesionalismo.\n\n"
 
             "📢 IMPORTANTE: Cuando se complete toda la información (incluida la confirmación de mayoría de edad), responde EXACTAMENTE con este mensaje:\n"
-            "\"¡Excelente! Con tu información completa, el siguiente paso es reservar un espacio gratuito con nuestro equipo. Puedes hacerlo directamente aquí: https://ticallmedia.com/shop/appointment ¡Estaremos encantados de atenderte! 🚀\"\n\n"
+            "\"¡Excelente! Con tu información completa, el siguiente paso es reservar un espacio gratuito con nuestro equipo. Puedes hacerlo directamente aquí: https://EMPRESA.com/shop/appointment ¡Estaremos encantados de atenderte! 🚀\"\n\n"
 
             "📌 En cualquier momento el usuario puede escribir 'finalizar' para cerrar el chat, "
             "o 'asesor' si desea ser atendido por una persona 🧑‍💼.\n\n"
@@ -53,7 +53,7 @@ MESSAGES = {
             "¡Estoy listo para ayudarte! 🚀"
         ),
         "prompt_ia_no": (
-            "¡Hola! 👋 Soy el asistente virtual de TicAll Media 😊. Veo que no estás seguro de continuar o solo estás probando el bot, ¡y eso está totalmente bien! 😄✨\n\n"
+            "¡Hola! 👋 Soy el asistente virtual de EMPRESA 😊. Veo que no estás seguro de continuar o solo estás probando el bot, ¡y eso está totalmente bien! 😄✨\n\n"
             "Si solo estás explorando, puedes preguntarme cualquier cosa sobre nuestros servicios digitales y estaré encantado de responder.\n\n"
             "Si prefieres hablar directamente con una persona, puedes escribir 'asesor' y uno de nuestros agentes te atenderá pronto 🧑‍💼.\n\n"
             "Y si por ahora no deseas continuar, puedes escribir 'finalizar' para cerrar este chat sin problema ✅.\n\n"
@@ -61,15 +61,15 @@ MESSAGES = {
         )
     },
     "en": {
-        "welcome_initial": "👋😊 Hello! Welcome to TicAll Media.",
+        "welcome_initial": "👋😊 Hello! Welcome to EMPRESA.",
         "greeting_text1": "Greetings! 🤖 Intrigued by a smarter marketing strategy?",
-        "greeting_text2": "At TicAll Media, we have ideas that might surprise you.\n\nReady to explore?",
+        "greeting_text2": "At EMPRESA, we have ideas that might surprise you.\n\nReady to explore?",
         "portafolio": "🚀 Looking for advice on a specific service?\n",
         "list_footer_text":"Choose one of the options to let me help you 📌:",
         "list_button_text": "View Portfolio",
         "agent": "One moment, please. ⏳ We're connecting you with one of our advisors. We'll be with you shortly! 😊",
         "prompt_ia_yes": (
-            "Hello! 👋 I'm TicAll Media's virtual assistant 😊. I'm here to help you request one of our digital services. "
+            "Hello! 👋 I'm EMPRESA's virtual assistant 😊. I'm here to help you request one of our digital services. "
             "I'll assist you with joy, respect, and plenty of emojis to make this experience more enjoyable 😄✨.\n\n"
 
             "To start, I'll ask for your full name so I can address you more personally. "
@@ -99,14 +99,14 @@ MESSAGES = {
             "📧 Contact email address\n"
             "📱 Confirm if this is your WhatsApp number or provide a different one\n"
             "📝 A brief description of your business or need\n"
-            "🔒 Inform you that by continuing, you authorize the processing of your personal data according to our privacy policy at https://ticallmedia.com/terms-and-conditions\n"
+            "🔒 Inform you that by continuing, you authorize the processing of your personal data according to our privacy policy at https://EMPRESA.com/terms-and-conditions\n"
             "🔞 Confirm if you are over 18 years old\n\n"
 
             "✅ I will validate that the data is in the correct format (for example, that the email contains '@' and the phone number is valid). "
             "I will always respond kindly and professionally.\n\n"
 
             "📢 IMPORTANT: Once all information is complete (including age confirmation), I will respond EXACTLY with this message:\n"
-            "\"Excellent! Now that your information is complete, the next step is to book a free slot with our team. You can do so directly here: https://ticallmedia.com/shop/appointment We'll be happy to assist you! 🚀\"\n\n"
+            "\"Excellent! Now that your information is complete, the next step is to book a free slot with our team. You can do so directly here: https://EMPRESA.com/shop/appointment We'll be happy to assist you! 🚀\"\n\n"
 
             "📌 At any time, you can type 'finish' to close the chat, "
             "or 'advisor' if you wish to speak with a person 🧑‍💼.\n\n"
@@ -114,7 +114,7 @@ MESSAGES = {
             "I'm ready to help you! 🚀"
         ),
         "prompt_ia_no": (
-            "Hello! 👋 I'm TicAll Media's virtual assistant 😊. I see you're not sure about continuing or you're just testing the bot, and that's totally fine! 😄✨\n\n"
+            "Hello! 👋 I'm EMPRESA's virtual assistant 😊. I see you're not sure about continuing or you're just testing the bot, and that's totally fine! 😄✨\n\n"
             "If you're just exploring, you can ask me anything about our digital services and I'll be happy to answer.\n\n"
             "If you prefer to speak directly with a person, you can type 'advisor' and one of our agents will assist you soon 🧑‍💼.\n\n"
             "And if you don't want to continue for now, you can type 'finish' to close this chat without any problem ✅.\n\n"
