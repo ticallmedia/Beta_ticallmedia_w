@@ -113,7 +113,7 @@ class ConversationManager:
         self.memory_cache = {}
         self.cache_lock = Lock()
 
-    def get_history(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
+    def get_history(self, telefono_id, lang="en", prompt_type="prompt_ia_yes"):
         """
             Obtiene historial desde BD con cache
             Si no existe, lo inicializa automáticamente con el prompt del sistema.
@@ -168,17 +168,18 @@ class ConversationManager:
                 logging.error(f"save_history: Error guardando historial para {telefono_id}: {e}")
                 raise
 
-    def _init_system_prompt(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
+    def _init_system_prompt(self, telefono_id, lang="en", prompt_type="prompt_ia_yes"):
         """Inicializa conversación con prompt del sistema"""
         try:
             message_prompt = get_message(lang, prompt_type)
             logging.info(f"_init_system_prompt: incia con el prompt IA")
             return [{"role": "system", "content": message_prompt}]
+        
         except Exception as e:
             logging.error(f"_init_system_prompt: Error inicializando prompt IA: {telefono_id}: {e}")
             return [{"role": "system", "content": message_prompt}]
 
-    def update_system_prompt(self, telefono_id, lang="es", prompt_type="prompt_ia_yes"):
+    def update_system_prompt(self, telefono_id, lang="en", prompt_type="prompt_ia_yes"):
         """
         Actualiza el prompt del sistema para un usuario existente.
         Útil cuando quieres cambiar entre prompt_ia_yes y prompt_ia_no.
@@ -259,7 +260,7 @@ conversation_manager = ConversationManager()
 #_______________________________________________________________________________________
 #6. FUNCIONES DE IA
 
-def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt_type="prompt_ia_yes"):
+def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="en", prompt_type="prompt_ia_yes"):
     """Gestiona la conversacion con la IA usando persistencia en  BD"""
 
     openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -272,6 +273,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt
 
     try:
         # 2. Obtiene el hisotiral desde manager (cache + BD) 
+        #Obtener historial (se inicializa automáticamente si es la primera vez)
         chat_history = conversation_manager.get_history(telefono_id, lang, prompt_type)
 
         if not chat_history:
@@ -282,17 +284,55 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang="es", prompt
         chat_history.append({"role": "user", "content": message_text})
 
         # 4. Limitar histortial para evitar exceder tokens
-        MAX_MESSAGES = 20
+        MAX_MESSAGES = 30
+        #if len(chat_history) > MAX_MESSAGES + 1:
+        #    chat_history = [chat_history[0]] + chat_history[-(MAX_MESSAGES):]
+
         if len(chat_history) > MAX_MESSAGES + 1:
-            chat_history = [chat_history[0]] + chat_history[-(MAX_MESSAGES):]
+            chat_history = [chat_history[0]] + chat_history[1:6] + chat_history[-(MAX_MESSAGES-5):]
+            logging.info(f"send_ia_message: Historial recortado para {telefono_id} - {len(chat_history)} mensajes")
 
         # 5. Llamar a OPENIA
+        """
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini", #"gpt-3.5-turbo",
             messages=chat_history,
             temperature=0.7,
             max_tokens=500
         )
+        """
+        # 5. CRÍTICO: Calcular tokens y ajustar max_tokens dinámicamente
+        chars_per_token = 4 if lang == "en" else 5
+        total_chars = sum(len(str(msg.get('content', ''))) for msg in chat_history)
+        estimated_input_tokens = total_chars // chars_per_token
+        
+        # Ajustar tokens de salida según contexto
+        if estimated_input_tokens > 3000:
+            max_output_tokens = 800
+        elif estimated_input_tokens > 1500:
+            max_output_tokens = 600
+        else:
+            max_output_tokens = 500
+        
+        logging.info(f"send_ia_message: Tokens estimados entrada={estimated_input_tokens}, max_salida={max_output_tokens}")
+
+        # 6. Configuración optimizada para GPT-4o-mini
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=chat_history,
+            temperature=0.7,
+            max_tokens=max_output_tokens, #Dinamico segun contexto
+            top_p=0.9, #ayuda a mantener la coherencia
+            frequency_penalty=0.3, #reduce repeticiones
+            presence_penalty=0.3 #fomenta variedad
+        )
+        respuesta_bot = response['choices'][0]['message']['content']
+        chat_history.pop()
+        chat_history.pop()
+
+        # 8. Detectar si la respuesta fue truncada
+
+
 
         # 6. Obtener la respuesta del asistente
         respuesta_bot = response['choices'][0]['message']['content']
