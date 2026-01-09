@@ -589,16 +589,16 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
 
     #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "nuevo"
         send_initial_messages(ESTADO_USUARIO,telefono_id, lang)        
     #elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, lang)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
-        lang = "es"
+        lang ="en"
         #ESTADO_USUARIO = "no_interesado"
         #chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
@@ -612,7 +612,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             prompt_type=prompt_type
             )
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
-        lang = "es"
+        lang ="en"
         #ESTADO_USUARIO = "interesado"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
@@ -627,11 +627,11 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             )
         
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "quiere_asesor"
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  lang)
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
-        lang = "es"
+        lang ="en"
         #ESTADO_USUARIO = "calificado"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
         #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
@@ -645,7 +645,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
             prompt_type=prompt_type
             )
     else:
-        lang = "es"
+        lang ="en"
         #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
         #ESTADO_USUARIO = "neutro"
         #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
