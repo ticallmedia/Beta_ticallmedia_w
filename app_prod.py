@@ -4,11 +4,12 @@ Dios bendiga este negocio y la properidad nos acompañe de la mano de Dios y su 
 """
 #_______________________________________________________________________________________
 #1. IMPORTS
+
 from flask import Flask, request, json, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta #ayuda para el calculo de tiempo
 import http.client
-import logging, requests
+import logging
 import os
 from dotenv import load_dotenv
 import openai
@@ -16,28 +17,11 @@ from prompt_ia import get_message
 from io import StringIO # Importar StringIO para el manejo de credenciales
 import threading
 from threading import Lock
+import psycopg2
 
 load_dotenv()
 #_______________________________________________________________________________________
 """
-Version 1.1:
-Creación 04/2025:
-
-Descripción: Primer Bot de Whatsapp para la empresa TicAll Media, 
-integrado con IA, un solo  idioma integrado con Zoho Sales IQ
-
-Caracteristicas: 
-
-- AI gpt-3.5-turbo inicialmente, en python con openai==0.28.1
-- En gitgnore, se agrega el archivo .env
-- Las credenciales se suben en render directamente
-
-Version 1.2:
-- Se agrega conexion a app B (API_middleware_zoho), la cual es un puente 
-entre App A de Waba y Zoho Sales IQ
-- La Función send_whatsapp_from_middleware permite la recepción de los
-mensajes de Zoho y la interaccion del agente humano
-
 Version 3:
 Descripción: Primer Bot de Whatsapp para la empresa TicAll Media, 
 integrado con IA de OpenAI
@@ -57,28 +41,22 @@ Actualiza 15/07/2025:
 Actualiza 21/07/2025:
 -Configuracion token fijo y numero de telefono en meta
 
-Version 3.3
-
 Actualiza 17/12/2025:
 - Se actualiza persistencia de historial de conversacion de la IA en BD esto con el fin
 de mejorar la persistencia cuando existen varios usuarios interactuando
 - se cambian varibles globales por class ConversationManager
 
-Version 4.0:
-- Adecuación producción en Version 4.0 beta
-- Fusión codigo App de Produccion, con Version 1.2 Beta que tiene conexion a Zoho
-
-
 """
 #_______________________________________________________________________________________
+
 # --- Recursos ---
-AGENTE_BOT = "Bot" # Usamos una constante para el agente
 IMA_SALUDO_URL = os.getenv("IMA_SALUDO_URL")
-APP_B_URL = os.getenv("APP_B_URL")
+AGENTE_BOT = "Bot" # Usamos una constante para el agente
+ESTADO_USUARIO = ""
 
 #_______________________________________________________________________________________
 #2. CONFIGURACIÓN DE LA APP
-# --- Funciones de la Aplicación Flask ---
+
 app = Flask(__name__)
 
 # Configura el logger (Log de eventos para ajustado para utilizarlo en render)
@@ -88,6 +66,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 #_______________________________________________________________________________________
 #3. MODELOS (Log, UsuariosBot, ConversationHistory)
 
@@ -124,9 +103,9 @@ class ConversationHistory(db.Model):
     #muestra el objeto en consola
     def __repr__(self):
         return f'<ConversationHistory: {self.telefono_usuario_id}>'
+
 #_______________________________________________________________________________________
 #4. CONVERSATIONMANAGER (Clase)
-
 class ConversationManager:
     """Gestor de conversaciones con persistencia en BD"""
 
@@ -317,7 +296,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
         # 5. Llamar a OPENIA
         
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", #"gpt-4o-mini"
+            model="gpt-4o-mini", #"gpt-3.5-turbo",
             messages=chat_history,
             temperature=0.7,
             max_tokens=500
@@ -364,6 +343,10 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
         )
         """
 
+        # 8. Detectar si la respuesta fue truncada
+
+
+
         # 6. Obtener la respuesta del asistente
         respuesta_bot = response['choices'][0]['message']['content']
         
@@ -374,13 +357,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
         conversation_manager.save_history(telefono_id, chat_history)
 
         # 9. guardar en el log y enviar mensaje
-        send_message_and_log(
-            ESTADO_USUARIO,
-            telefono_id, 
-            respuesta_bot, 
-            'text',
-            AGENTE_BOT = "Bot"
-            )
+        send_message_and_log(ESTADO_USUARIO,telefono_id, respuesta_bot, 'text')
 
         logging.info(f"send_ia_message: Consulta a la IA {telefono_id}: {respuesta_bot[:100]}...")
     
@@ -390,9 +367,8 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
             ESTADO_USUARIO, 
             telefono_id, 
             "Estamos experimentando alta demanda. Por favor intenta en unos momentos.", 
-            'text',
-            AGENTE_BOT = "Bot"
-            )
+            'text'
+        )
         
     except openai.error.InvalidRequestError as e:
         logging.error(f"send_ia_message: Request inválido para {telefono_id}: {e}")
@@ -401,9 +377,8 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
             ESTADO_USUARIO, 
             telefono_id, 
             "He reiniciado nuestra conversación. ¿En qué puedo ayudarte?", 
-            'text',
-            AGENTE_BOT = "Bot"
-            )
+            'text'
+        )
         
     except Exception as e:
         logging.error(f"send_ia_message: Error en conversación con IA para {telefono_id}: {e}")
@@ -411,9 +386,8 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
             ESTADO_USUARIO, 
             telefono_id, 
             "Lo siento, hubo un error procesando tu mensaje. Por favor intenta nuevamente.", 
-            'text',
-            AGENTE_BOT = "Bot"
-            )
+            'text'
+        )
 #_______________________________________________________________________________________
 #7. FUNCIONES DE LOG (threading)
 def _agregar_mensajes_log_thread_safe(log_data_json):
@@ -431,10 +405,10 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
             )
             db.session.add(nuevo_registro)
             db.session.commit()
-            logging.info(f"_agregar_mensajes_log_thread_safe:Registro de log añadido a DB (hilo): {datos.get('mensaje')}")
+            logging.info(f"Registro de log añadido a DB (hilo): {datos.get('mensaje')}")
         except Exception as e:
             db.session.rollback() # Si hay un error, revertir la transacción
-            logging.error(f"_agregar_mensajes_log_thread_safe:Error añadiendo log a DB (hilo): {e}")
+            logging.error(f"Error añadiendo log a DB (hilo): {e}")
 
 #_______________________________________________________________________________________
 #8. API WHATSAPP
@@ -462,6 +436,7 @@ def send_whatsapp_message(data):
         connection.close()
 #_______________________________________________________________________________________
 #9. ENDPOINTS
+# --- Funciones de la Aplicación Flask ---
 @app.route('/')
 def index():
     """Renderiza la página principal con los registros del log."""
@@ -475,6 +450,7 @@ def history_temp():
     registros_ia = ConversationHistory.query.all()
     registros_ia_ordenados = sorted(registros_ia, key=lambda x: x.created_at, reverse=True)
     return render_template('history_temp.html', registros_ia= registros_ia_ordenados )
+
 
 @app.route('/clear_history/<telefono_id>', methods=['GET','POST'])
 def clear_user_history(telefono_id):
@@ -505,6 +481,7 @@ def clear_user_history(telefono_id):
         
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 @app.route('/cleanup_old_histories', methods=['POST'])
 def cleanup_old_histories_endpoint():
     """
@@ -521,142 +498,7 @@ def cleanup_old_histories_endpoint():
     except Exception as e:
         logging.error(f"Error en cleanup endpoint: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
-
-
-
-@app.route('/api/envio_whatsapp', methods=['POST'])
-def send_whatsapp_from_middleware():
-    """
-    Recibe una petición de la App B (middleware) y envía el mensaje a WhatsApp.
-    """
-    try:
-        data = request.json
-        telefono_id = data.get("phone_number")
-        message_text = data.get("message")
-        sender_role = data.get("human_agent")
-
-        if not telefono_id or not message_text:
-            logging.error("Petición a /api/envio_whatsapp incompleta.")
-            return {"status": "error", "message": "Faltan phone_number o message"}, 400
-
-        # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
-
-        """
-        whatsapp_payload = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": telefono_id,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": message_text
-            }
-        }
-
-        
-        logging.info(f"envio_whatsapp: Payload que se enviara a whatsapp: {whatsapp_payload}")
-
-        """
-
-        # Llama a tu función existente para enviar el mensaje
-        #send_whatsapp_message(whatsapp_payload)
-        
-        send_message_and_log("Estado Zoho",telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
-
-        return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
-
-    except Exception as e:
-        logging.error(f"Error en /api/envio_whatsapp: {e}")
-        return {"status": "error", "message": "Error interno del servidor"}, 500
-
-#_______________________________________________________________________________________
-
-"""
-def agregar_mensajes_log(datos_json):
-    #Agrega un registro de mensaje a la base de datos.
-    datos = json.loads(datos_json)
-    nuevo_registro = Log(
-        telefono_usuario_id=datos.get('telefono_usuario_id'),
-        plataforma=datos.get('plataforma'),
-        mensaje=datos.get('mensaje'),
-        estado_usuario=datos.get('estado_usuario'),
-        etiqueta_campana=datos.get('etiqueta_campana'),
-        agente=datos.get('agente')
-    )
-    db.session.add(nuevo_registro)
-    db.session.commit()
-"""
-
-#___________________________________________________________________________
-#___________________________________________________________________________
-"""
-Analiza el payload de la API de whatsapp y extrae el texto principal,
-este solo se utili para extraer el mensaje generado por el bot
-"""
-def extraer_texto_para_zoho(data):
-    try:
-        message_type = data.get("type")
-        texto_extraido = ""
-
-        if message_type == 'text':
-            texto_extraido = data.get('text',{}).get('body','')
-        
-        elif message_type == "image":
-            texto_extraido = data.get('image',{}).get('caption','[Imagen enviada]')
-
-        elif message_type == "interactive":
-            interactive_type = data.get('interactive',{}).get('type')
-
-            if interactive_type in ['button','list']:
-                texto_extraido = data.get('interactive',{}).get('body',{}).get('text','')
-        
-        #si no se encontro texto, devolver un placeholder para saber que se envio algo
-        if not texto_extraido:
-            return "[Mensjase interactivo o multimedia]"
-
-        return texto_extraido
-
-    except Exception as e:
-        logging.error(f"extraer_texto_para_zoho: error extrayendo texto para zoho: {e}")
-        return "[Error al procesar el mensaje para el bot]"
-
-"""
-Esta funcion registra primero en zoho y luego envia a whatsapp
-"""
-def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
-    #1. Extrae el mensaje de humanos para zoho
-    mensaje_para_zoho = extraer_texto_para_zoho(data)
-
-    #2. Envia a zoho con una etiqueta para identificar los mensajes del bot
-    if "Agente Humano" in AGENTE_BOT: #se agrega if para impedir que se reescriba informacion en zoho cuando habla el agente humano
-        logging.info(f"Mensaje de (ECO) ignorado...") 
-        
-    elif mensaje_para_zoho:
-        logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
-        send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
     
-    #3. Envia mensaje del bot a whatsapp
-    send_whatsapp_message(data)
-
-"""
-envio de mensajes a Zoho Sales IQ
-"""
-
-def send_zoho(telefono_id, mensaje_texto, tag):
-    payload = {
-            "message": mensaje_texto,
-            "user_id": telefono_id,
-            "tag": tag  # 👈 nuevo campo opcional
-        }
-
-    try:
-        resp = requests.post(APP_B_URL, json=payload, timeout=5)
-        logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
-    except Exception as e:
-        logging.error(f"❌ Error reenviando a App B: {e}")  
-
-
-#_______________________________________________________________________________________
 #_______________________________________________________________________________________
 # --- Uso del Token y recepción de mensajes ---
 TOKEN_CODE = os.getenv('META_WHATSAPP_TOKEN_CODE')
@@ -692,16 +534,6 @@ def recibir_mensajes(req):
         value = changes.get('value', {})
         objeto_mensaje = value.get('messages', [])
 
-
-        #comprobacion: si el payload contiene 'statuses' y no 'messages'
-        #significa que es una notificacion de  (entregado, leido etc), de los mensajes enviados
-        #se agrega para evitar el ECO de zoho
-
-        if "statuses" in value:
-            logging.info("webhook de estado de mensaje (ECO) recibido. Ingorado...")
-            return "OK", 200
-
-
         if objeto_mensaje:
             message = objeto_mensaje[0]
             telefono_id = message.get('from')
@@ -719,17 +551,9 @@ def recibir_mensajes(req):
 
             if telefono_id and mensaje_texto:
 
-                chat_history = [{"role": "system", "content": mensaje_texto}]
-                AGENTE_BOT = "Usuario"
-                #___________________________________________________________________________
-                ##envio a Zoho Sales IQ
+                #chat_history = [{"role": "system", "content": mensaje_texto}]    
 
-                send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
-
-                #___________________________________________________________________________
-
-
-                procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
+                procesar_y_responder_mensaje(telefono_id, mensaje_texto)
             else:
                 logging.info("Mensaje no procesable (sin ID de teléfono o texto de mensaje).")
         
@@ -738,7 +562,7 @@ def recibir_mensajes(req):
         logging.error(f"Error en recibir_mensajes: {e}")
         return jsonify({'message': 'EVENT_RECEIVED_ERROR'}), 500
 
-def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
+def procesar_y_responder_mensaje(telefono_id, mensaje_recibido):
     """
     Procesa un mensaje recibido, determina el idioma del usuario y envía la respuesta adecuada.
     Registra el mensaje entrante y la respuesta en la base de datos y Google Sheets.
@@ -752,26 +576,32 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         'plataforma': 'whatsapp 📞📱💬',
         'mensaje': mensaje_recibido,
         'estado_usuario': 'recibido',
-        'etiqueta_campana': 'Interesado',
+        'etiqueta_campana': 'usuarios nuevos',
         'agente': AGENTE_BOT
     }
 
     saludo_clave = ["hola","hi","hello","start","alo"]
     portafolio_clave = ["portfolio", "view services", "show options",
                         "portafolio", "ver servicios", "mostrar opciones"]
+
     # Delega el registro en la DB y la exportación a Google Sheets a un hilo
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_in),)).start()
 
+    #if mensaje_procesado == "hola" or mensaje_procesado == "hi" or mensaje_procesado == "hello":
     if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "nuevo"
-        send_initial_messages(ESTADO_USUARIO, telefono_id, lang)        
+        send_initial_messages(ESTADO_USUARIO,telefono_id, lang)        
+    #elif mensaje_procesado == "btn_si1" or mensaje_procesado in ["portafolio","servicios","productos"]:
     elif "btn_si1" in  mensaje_procesado or any (palabra in mensaje_procesado for palabra in portafolio_clave):
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "interesado"
         request1_messages(ESTADO_USUARIO, telefono_id, lang)  
     elif mensaje_procesado == "btn_no1" or mensaje_procesado == "no":
-        lang = "es"
+        lang ="en"
+        #ESTADO_USUARIO = "no_interesado"
+        #chat_history = send_ia_prompt("prompt_ia_no", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
         prompt_type  = "prompt_ia_no"
 
         send_ia_message(
@@ -782,7 +612,10 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             prompt_type=prompt_type
             )
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
-        lang = "es"
+        lang ="en"
+        #ESTADO_USUARIO = "interesado"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
         prompt_type  = "prompt_ia_yes"
 
         send_ia_message(
@@ -792,17 +625,16 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
+        
     elif mensaje_procesado in ["btn_0" ,"asesor"]:
-        lang = "es"
+        lang ="en"
         ESTADO_USUARIO = "quiere_asesor"
         send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  lang)
-    
-    #_____________________________________
-    ##REVISAR LA FINALIZACION DEL CHAT
-    #_____________________________________
-
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
-        lang = "es"
+        lang ="en"
+        #ESTADO_USUARIO = "calificado"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
         prompt_type  = "prompt_ia_yes"
 
         send_ia_message(
@@ -813,7 +645,12 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             prompt_type=prompt_type
             )
     else:
-        lang = "es"
+        lang ="en"
+        #no se actualiza estado esperando que herede la ultma condición de: ESTADO_USUARIO
+        #ESTADO_USUARIO = "neutro"
+        #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+        #send_ia_message(ESTADO_USUARIO, telefono_id, mensaje_procesado, chat_history, lang)
+        
         prompt_type  = "prompt_ia_yes"
 
         send_ia_message(
@@ -826,15 +663,16 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
 
 
 
-def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
+def send_initial_messages(ESTADO_USUARIO,telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
     # Saludo en el idioma elegido
+
     message_response = get_message(lang, "welcome_initial")
-    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT = "Bot")
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'image', AGENTE_BOT = "Bot")
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'image')
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
@@ -850,15 +688,14 @@ def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
     no_id = "btn_no1"
 
     message_response_for_buttons = get_message(lang, "greeting_text2")
-    
+
     send_message_and_log(
         ESTADO_USUARIO,
         telefono_id, 
         message_response_for_buttons, 
         'button', 
         button_titles=[si_title, no_title], # Pasamos los títulos que varían por idioma
-        button_ids=[si_id, no_id] ,# Pasamos los IDs fijos
-        AGENTE_BOT = "Bot"
+        button_ids=[si_id, no_id]           # Pasamos los IDs fijos
     )
 
 
@@ -867,7 +704,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     #titulos
 
     message_response_for_list = get_message(lang, "portafolio")
-    
+
     send_message_and_log(
         ESTADO_USUARIO,
         telefono_id, 
@@ -890,11 +727,15 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
                       "Expert Human Assistance"] # la descripcion  no debe superar 72 caracteres
     )
 
-def send_adviser_messages(ESTADO_USUARIO, telefono_id, mensaje_procesado, lang):
-    """El usuario esta interesado y quiere concretar una cita"""
-    #message_response = get_message(lang, "agent")
-    #send_message_and_log(telefono_id, message_response, 'text', AGENTE_BOT = "Bot")
 
+def send_adviser_messages(ESTADO_USUARIO, telefono_id,mensaje_procesado, lang):
+    """El usuario esta interesado y quiere concretar una cita"""
+
+    #message_response = get_message(lang, "agent")
+    #send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text')
+    #chat_history = send_ia_prompt("prompt_ia_yes", telefono_id)
+    #send_ia_message(ESTADO_USUARIO,telefono_id, mensaje_procesado, chat_history, lang)
+    
     prompt_type  = "prompt_ia_yes"
 
     send_ia_message(
@@ -906,7 +747,7 @@ def send_adviser_messages(ESTADO_USUARIO, telefono_id, mensaje_procesado, lang):
         )
 
 
-def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None):
+def send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -979,9 +820,9 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
             "interactive": {
                 "type": "list",
                 "body": {"text": message_text},
-                "footer": {"text": get_message("es", "list_footer_text")},
+                "footer": {"text": get_message("en", "list_footer_text")},
                 "action": {
-                    "button": "Portafolio",
+                    "button": "Portfolio",
                     "sections": [
                         {
                             "title": "Servicios disponibles",
@@ -1010,8 +851,7 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
 
     threading.Thread(target=_agregar_mensajes_log_thread_safe, args=(json.dumps(log_data_out),)).start()
 
-    #send_whatsapp_message(data)
-    enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT)
+    send_whatsapp_message(data)
 
 #_______________________________________________________________________________________
 #10. INICIALIZACIÓN
@@ -1021,8 +861,9 @@ with app.app_context():
     logging.info(f"Tablas inicializadas: Log, UsuariosBot, ConversationHistory")
 #_______________________________________________________________________________________
 # --- Ejecución del Programa ---
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
-
+#_______________________________________________________________________________________
 
     
