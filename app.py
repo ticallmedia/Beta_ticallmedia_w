@@ -560,9 +560,10 @@ def send_whatsapp_from_middleware():
 
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
-        
-        send_message_and_log("Estado Zoho",telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
+        ESTADO_USUARIO="Estado Zoho"
 
+        send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
+        
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
     except Exception as e:
@@ -834,7 +835,7 @@ def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
 
     # Imagen
     message_response = get_message(lang, "greeting_text1") # Quizás 'greeting_image_caption' sea más apropiado aquí
-    send_message_and_log(telefono_id, message_response, 'image', AGENTE_BOT = "Bot")
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'image', AGENTE_BOT = "Bot")
 
     #Botones pregunta1
     # Definimos los títulos de los botones según el idioma
