@@ -720,7 +720,7 @@ def recibir_mensajes(req):
 
             if telefono_id and mensaje_texto:
 
-                chat_history = [{"role": "system", "content": mensaje_texto}]
+                #chat_history = [{"role": "system", "content": mensaje_texto}]
                 AGENTE_BOT = "Usuario"
                 #___________________________________________________________________________
                 ##envio a Zoho Sales IQ
@@ -868,27 +868,22 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     #titulos
 
     message_response_for_list = get_message(lang, "portafolio")
-    
+
     send_message_and_log(
         ESTADO_USUARIO,
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = ["📱DDA & Mobile Campaigns","📊Display Media Planning","🛒Ecommerce Strategy",
-                       "📣Paid Social Media","🎯Audience Studies","🚀Digital Marketing",
-                       "📰Media Strategy","🤖Custom Bot Development","🌐WebSites",
-                       "🗣️Talk to an Agent"], # El titulo no debe superar 24 caracteres
+        list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
+                       "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
+                       "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
+                       "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
-        list_descrip=["Physical & Mobile Convert.",
-                      "Formats and Creatives",
-                      "Leading Strategies",
-                      "Paid Social Media Mgmt",
-                      "Analysis and Trends",
-                      "SEO, Social Media & PPC",
-                      "Best Media Strategy",
-                      "Chatbots & Automation",
-                      "Web Dev and UX",
-                      "Expert Human Assistance"] # la descripcion  no debe superar 72 caracteres
+        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
+                      "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
+                      "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
+                      "Atención personalizada"] ,# la descripcion  no debe superar 72 caracteres
+        AGENTE_BOT = "Bot"
     )
 
 def send_adviser_messages(ESTADO_USUARIO, telefono_id, mensaje_procesado, lang):
@@ -982,7 +977,7 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
                 "body": {"text": message_text},
                 "footer": {"text": get_message("es", "list_footer_text")},
                 "action": {
-                    "button": "Portafolio",
+                    "button": "Portfolio",
                     "sections": [
                         {
                             "title": "Servicios disponibles",
