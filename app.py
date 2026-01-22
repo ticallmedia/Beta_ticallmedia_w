@@ -875,14 +875,16 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         message_response_for_list, 
         'list', 
         list_titles = ["📱DDA & Mobile Campaigns","📊Display Media Planning","🛒Ecommerce Strategy",
-                       "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
+                       "📣Paid Social Media","🎯Audience Studies","🚀Digital Marketing",
                        "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
                        "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
         list_descrip=["Physical & Mobile Convert.",
                       "Formats and Creatives",
                       "Leading Strategies",
-                      "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
+                      "Paid Social Media Mgmt",
+                      "Analysis and Trends",
+                      "SEO, Social Media & PPC",
                       "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
                       "Atención personalizada"] ,# la descripcion  no debe superar 72 caracteres
         AGENTE_BOT = "Bot"
