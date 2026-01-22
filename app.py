@@ -874,12 +874,13 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = ["DDA & Mobile 📱","Websites 🌐","Photography 📸",
+        list_titles = ["📱DDA & Mobile Campaigns","Websites 🌐","Photography 📸",
                        "Content Mktg ✍️","Media Strat 📈","Digital Mktg 💻",
                        "Paid Social 📊","Ecommerce Strat 🛒","Display Media 📺",
                        "Hablar con agente 🗣️"], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
-        list_descrip=["DDA And Mobile Campaigns.","Desarrollo de sitios","Fotografía profesional para marcas",
+        list_descrip=["Physical & Mobile Convert.",
+                      "Desarrollo de sitios","Fotografía profesional para marcas",
                       "Estrategias de contenido digital","Planificación de medios digitales","Marketing digital multicanal",
                       "Anuncios pagados en redes sociales","Estrategia para tiendas en línea","Publicidad en banners y medios",
                       "Atención personalizada"] ,# la descripcion  no debe superar 72 caracteres
