@@ -65,6 +65,7 @@ de mejorar la persistencia cuando existen varios usuarios interactuando
 - se cambian varibles globales por class ConversationManager
 
 Version 4.0:
+Actualiza 08/01/2026:
 - Adecuación producción en Version 4.0 beta
 - Fusión codigo App de Produccion, con Version 1.2 Beta que tiene conexion a Zoho
 
@@ -725,7 +726,7 @@ def recibir_mensajes(req):
                 #___________________________________________________________________________
                 ##envio a Zoho Sales IQ
 
-                send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
+                #send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
 
                 #___________________________________________________________________________
 
