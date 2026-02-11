@@ -20,9 +20,9 @@ MESSAGES = {
 
             "=== MAPEO DE BOTONES ===\n"
             "Cuando el usuario seleccione uno de los botones del portafolio, estos son los equivalentes:\n"
-            "'btn_1' corresponde a '🔄 TicAll Flow®️Ecosystem'\n"
+            "'btn_1' corresponde a '🔄 TicAll Flow®️Ecosys'\n"
             "'btn_2' corresponde a '🤖 Custom AI Agents'\n"
-            "'btn_3' corresponde a '🛒 Ecommerce Architecture'\n"
+            "'btn_3' corresponde a '🛒 Ecommerce Arch'\n"
             "'btn_4' corresponde a '⚡ Performance Arch'\n"
             "'btn_5' corresponde a '📈 Demand Generation'\n"
             "'btn_6' corresponde a '🌐 High-Performance Webs'\n"
@@ -118,9 +118,9 @@ MESSAGES = {
 
             "=== BUTTON MAPPINGS ===\n"
             "When you select one of the portfolio buttons, these are the equivalents:\n"
-            "'btn_1' corresponde a '🔄 TicAll Flow®️Ecosystem'\n"
+            "'btn_1' corresponde a '🔄 TicAll Flow®️Ecosys'\n"
             "'btn_2' corresponde a '🤖 Custom AI Agents'\n"
-            "'btn_3' corresponde a '🛒 Ecommerce Architecture'\n"
+            "'btn_3' corresponde a '🛒 Ecommerce Arch'\n"
             "'btn_4' corresponde a '⚡ Performance Arch'\n"
             "'btn_5' corresponde a '📈 Demand Generation'\n"
             "'btn_6' corresponde a '🌐 High-Performance Webs'\n"
