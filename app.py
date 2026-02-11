@@ -876,14 +876,14 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = ["🔄TicAll Flow®️Ecosys","📊Display Media Planning","🛒Ecommerce Strategy",
+        list_titles = ["🔄TicAll Flow®️Ecosys","🤖Custom AI Agents","🛒Ecommerce Arch",
                        "📣Paid Social Media","🎯Audience Studies","🚀Digital Marketing",
                        "📰Media Strategy","🤖Custom Bot Development","🌐WebSites",
                        "🗣️Talk to an Agent"], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
         list_descrip=["Growth Infrastructure Design",
-                      "Formats and Creatives",
-                      "Leading Strategies",
+                      "AI Agents & Automation",
+                      "Scalable Commerce Hubs",
                       "Paid Social Media Mgmt",
                       "Analysis and Trends",
                       "SEO, Social Media & PPC",
