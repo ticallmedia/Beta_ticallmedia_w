@@ -878,18 +878,14 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         'list', 
         list_titles = ["🔄TicAll Flow®️Ecosys","🤖Custom AI Agents","🛒Ecommerce Arch",
                        "⚡Performance Arch","📈Demand Generation","🌐High-Performance Webs",
-                       "📰Media Strategy","🤖Custom Bot Development","🌐WebSites",
                        "🗣️Talk to an Agent"], # El titulo no debe superar 24 caracteres
-        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9","btn_0"],           # Pasamos los IDs fijos
+        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_0"],           # Pasamos los IDs fijos
         list_descrip=["Growth Infrastructure Design",
                       "AI Agents & Automation",
                       "Scalable Commerce Hubs",
                       "ROI-Driven Architecture",
                       "Scalable Paid Media",
                       "Scalable Web Systems",
-                      "Best Media Strategy",
-                      "Chatbots & Automation",
-                      "Web Dev and UX",
                       "Expert Human Assistance"] ,# la descripcion  no debe superar 72 caracteres
         AGENTE_BOT = "Bot"
     )
