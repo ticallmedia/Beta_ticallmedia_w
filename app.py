@@ -876,7 +876,7 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         telefono_id, 
         message_response_for_list, 
         'list', 
-        list_titles = ["🔄 TicAll Flow®️Ecosystem","🤖 Custom AI Agents","🛒 Ecommerce Architecture",
+        list_titles = ["🔄 TicAll Flow®️Eco","🤖 Custom AI Agents","🛒 Ecommerce Arch",
                        "⚡ Performance Arch","📈 Demand Generation","🌐 High-Performance Webs"], # El titulo no debe superar 24 caracteres
         list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_0"],           # Pasamos los IDs fijos
         list_descrip=["Growth Infrastructure Design",
