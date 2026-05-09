@@ -69,6 +69,12 @@ Actualiza 08/01/2026:
 - Adecuación producción en Version 4.0 beta
 - Fusión codigo App de Produccion, con Version 1.2 Beta que tiene conexion a Zoho
 
+Version 4.1:
+Actualiza 09/05/2026:
+- Soporte para recepcion de archivos e imagenes desde Zoho SalesIQ (App B)
+- Ajuste en send_whatsapp_from_middleware para detectar media_url y media_type
+- Ajuste en send_message_and_log para enviar documentos e imagenes dinamicas por WhatsApp
+- Correccion de bloque 'image' duplicado en send_message_and_log
 
 """
 #_______________________________________________________________________________________
@@ -535,35 +541,25 @@ def send_whatsapp_from_middleware():
         telefono_id = data.get("phone_number")
         message_text = data.get("message")
         sender_role = data.get("human_agent")
+        media_url   = data.get("media_url")
+        media_type  = data.get("media_type")
 
-        if not telefono_id or not message_text:
-            logging.error("Petición a /api/envio_whatsapp incompleta.")
-            return {"status": "error", "message": "Faltan phone_number o message"}, 400
-
-        # Reutilizamos la lógica que ya tienes para enviar un mensaje de texto simple
-
-        """
-        whatsapp_payload = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": telefono_id,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": message_text
-            }
-        }
-
-        
-        logging.info(f"envio_whatsapp: Payload que se enviara a whatsapp: {whatsapp_payload}")
-
-        """
+        if not telefono_id or (not message_text and not media_url):
+            logging.error(f"send_whatsapp_from_middleware:Petición a /api/envio_whatsapp incompleta.")
+            return {f"status":"error","message":"Faltan phone_number o contenido"}, 400
 
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
         ESTADO_USUARIO="Estado Zoho"
 
-        send_message_and_log(ESTADO_USUARIO,telefono_id, message_text, 'text', AGENTE_BOT = "Agente Humano")
+        msg_type = 'text'
+        if media_url:
+            msg_type = 'image' if 'image' in (media_type or '') else 'document'
+        
+        send_message_and_log(
+            ESTADO_USUARIO, telefono_id, message_text or '', msg_type,
+            media_url=media_url, AGENTE_BOT="Agente Humano"
+        )
         
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
 
@@ -605,6 +601,9 @@ def extraer_texto_para_zoho(data):
         
         elif message_type == "image":
             texto_extraido = data.get('image',{}).get('caption','[Imagen enviada]')
+        
+        elif message_type == "document":
+            texto_extraido = data.get('document',{}).get('caption','[Documento enviado]')
 
         elif message_type == "interactive":
             interactive_type = data.get('interactive',{}).get('type')
@@ -906,7 +905,7 @@ def send_adviser_messages(ESTADO_USUARIO, telefono_id, mensaje_procesado, lang):
         )
 
 
-def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None):
+def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None, media_url=None):
     """
     Construye y envía un mensaje de WhatsApp, y registra la interacción.
     :param telefono_id: ID del teléfono del destinatario.
@@ -925,17 +924,6 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
             "text": {
                 "preview_url": False,
                 "body": message_text
-            }
-        }
-    elif message_type == 'image':
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": telefono_id,
-            "type": "image",
-            "image": {
-                "link": IMA_SALUDO_URL,
-                "caption": message_text # El texto se usa como descripción de la imagen
             }
         }
     elif message_type == 'button' and button_titles and button_ids and len(button_titles) == len(button_ids):
@@ -989,6 +977,30 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
                         }
                     ]
                 }
+            }
+        }
+    
+    elif message_type == 'image':
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": telefono_id,
+            "type": "image",
+            "image": {
+                "link": media_url or IMA_SALUDO_URL,
+                "caption": message_text
+            }
+        }
+ 
+    elif message_type == 'document':
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": telefono_id,
+            "type": "document",
+            "document": {
+                "link": media_url,
+                "caption": message_text or ""
             }
         }
 
