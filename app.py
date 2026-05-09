@@ -76,6 +76,8 @@ Actualiza 09/05/2026:
 - Ajuste en send_message_and_log para enviar documentos e imagenes dinamicas por WhatsApp
 - Correccion de bloque 'image' duplicado en send_message_and_log
 - Agregado prefijo visual ═════════════ 🤖 TAM Bot ═════════════ a mensajes del bot enviados a Zoho para diferenciacion del operador
+- Sistema de modo operador: pausa la IA cuando un agente humano responde desde Zoho (30 min)
+- Logging detallado en /api/envio_whatsapp para diagnostico de envio desde Zoho
 
 """
 #_______________________________________________________________________________________
@@ -83,6 +85,34 @@ Actualiza 09/05/2026:
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
 IMA_SALUDO_URL = os.getenv("IMA_SALUDO_URL")
 APP_B_URL = os.getenv("APP_B_URL")
+
+# --- Modo Operador: desconecta IA cuando agente humano toma control ---
+MODO_OPERADOR = {}
+MODO_OPERADOR_LOCK = Lock()
+TIEMPO_PAUSA_MINUTOS = 30
+
+def activar_modo_operador(telefono_id):
+    """Marca un número como en modo operador (IA pausada)."""
+    with MODO_OPERADOR_LOCK:
+        MODO_OPERADOR[telefono_id] = datetime.now()
+        logging.info(f"activar_modo_operador: [MODO OPERADOR] Activado para {telefono_id}")
+
+def desactivar_modo_operador(telefono_id):
+    """Reactiva el bot para un número."""
+    with MODO_OPERADOR_LOCK:
+        MODO_OPERADOR.pop(telefono_id, None)
+        logging.info(f"activar_modo_operador: [MODO OPERADOR] Desactivado para {telefono_id}")
+
+def esta_en_modo_operador(telefono_id):
+    """Verifica si un número está en modo operador (últimos N minutos)."""
+    with MODO_OPERADOR_LOCK:
+        if telefono_id in MODO_OPERADOR:
+            tiempo_pasado = datetime.now() - MODO_OPERADOR[telefono_id]
+            if tiempo_pasado < timedelta(minutes=TIEMPO_PAUSA_MINUTOS):
+                return True
+            else:
+                del MODO_OPERADOR[telefono_id]
+        return False
 
 #_______________________________________________________________________________________
 #2. CONFIGURACIÓN DE LA APP
@@ -118,6 +148,8 @@ class UsuariosBot(db.Model):
     nombre_preferido = db.Column(db.Text)
     estado_usuario = db.Column(db.Text)
     fecha_y_hora = db.Column(db.DateTime, default=datetime.utcnow)
+    chat_finalizado = db.Column(db.Boolean, default=False)
+    agente_actual = db.Column(db.String(50), default="IA") #estados IA y Asesor
 
 class ConversationHistory(db.Model):
     """Tabla para el historial de conversaciones con IA"""
@@ -382,13 +414,46 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
         conversation_manager.save_history(telefono_id, chat_history)
 
         # 9. guardar en el log y enviar mensaje
-        send_message_and_log(
-            ESTADO_USUARIO,
-            telefono_id, 
-            respuesta_bot, 
-            'text',
-            AGENTE_BOT = "Bot"
+
+        if "Tu información está completa" in respuesta_bot:
+            """
+            Se marca en la BD Usuariosbot que la conversación terminó y el agente actual es IA
+            """
+            #9.1 actualizando BD
+
+            usuario = UsuariosBot.query.filter_by(telefono_usuario_id =telefono_id).first()
+            if usuario:
+                usuario.chat_finalizado = True
+                db.session.commit()
+            
+
+            #9.2 Se envia mensaje de confirmacion, es decir el resumen de los datos recopilados 
+            send_message_and_log(
+                ESTADO_USUARIO,
+                telefono_id,
+                respuesta_bot,
+                'text',
+                AGENTE_BOT = "Bot"
             )
+
+            #Envia los botones de opciones finalizar-asesor
+            send_message_and_log(
+                ESTADO_USUARIO,
+                telefono_id,
+                '¿deseas continuar?',
+                'button',
+                button_titles = ["Hablar con un asesor","Finalizar"],
+                button_ids = ["btn_asesor", "btn_finalizar"],
+                AGENTE_BOT = "Bot"
+            )
+        else:
+            send_message_and_log(
+                ESTADO_USUARIO,
+                telefono_id, 
+                respuesta_bot, 
+                'text',
+                AGENTE_BOT = "Bot"
+                )
 
         logging.info(f"send_ia_message: Consulta a la IA {telefono_id}: {respuesta_bot[:100]}...")
     
@@ -539,15 +604,24 @@ def send_whatsapp_from_middleware():
     """
     try:
         data = request.json
+        logging.info(f"[ENVIO_WHATSAPP] Payload recibido de App B: {json.dumps(data)}")
+
         telefono_id = data.get("phone_number")
         message_text = data.get("message")
         sender_role = data.get("human_agent")
         media_url   = data.get("media_url")
         media_type  = data.get("media_type")
 
+        logging.info(f"[ENVIO_WHATSAPP] phone_number={telefono_id}, sender_role={sender_role}, text={message_text}, media_url={media_url}")
+
         if not telefono_id or (not message_text and not media_url):
-            logging.error(f"send_whatsapp_from_middleware:Petición a /api/envio_whatsapp incompleta.")
+            logging.error(f"[ENVIO_WHATSAPP] Petición incompleta: phone_number={telefono_id}, text={message_text}, media_url={media_url}")
             return {f"status":"error","message":"Faltan phone_number o contenido"}, 400
+        
+        # Si viene de un agente humano, activar modo operador para evitar que la IA intervenga
+        if sender_role == "human_agent":
+            activar_modo_operador(telefono_id)
+            logging.info(f"[ENVIO_WHATSAPP] Modo operador activado para {telefono_id} (mensaje de agente humano)")
 
         # Llama a tu función existente para enviar el mensaje
         #send_whatsapp_message(whatsapp_payload)
@@ -733,8 +807,10 @@ def recibir_mensajes(req):
 
                 #___________________________________________________________________________
 
-
-                procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
+                if esta_en_modo_operador(telefono_id):
+                    logging.info(f"[MODO OPERADOR] IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
+                else:
+                    procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
             else:
                 logging.info("Mensaje no procesable (sin ID de teléfono o texto de mensaje).")
         
@@ -786,7 +862,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
-    #elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_7","btn_8","btn_9"]:
+
     elif mensaje_procesado in ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6"]:
         lang = "es"
         prompt_type  = "prompt_ia_yes"
@@ -798,11 +874,6 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
-    elif mensaje_procesado in ["btn_0" ,"asesor"]:
-        lang = "es"
-        ESTADO_USUARIO = "quiere_asesor"
-        send_adviser_messages(ESTADO_USUARIO,telefono_id, mensaje_procesado,  lang)
-    
     #_____________________________________
     ##REVISAR LA FINALIZACION DEL CHAT
     #_____________________________________
@@ -818,6 +889,43 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
+    #_____________________________________
+    ##REVISAR CONECTAR ASESOR Y FINALIZACION
+    #_____________________________________
+
+    elif mensaje_procesado == "btn_asesor":
+        lang = "es"
+        prompt_type  = "prompt_ia_yes"
+
+        #1. Actualizar estado del usuario a conectado
+        usuario = UsuariosBot.query.filter_by(telefono_usuario_id = telefono_id).first()
+        if usuario:
+            usuario.agente_actual = "Asesor"
+            db.session.commit()
+
+        #2. Activar modo operador
+        activar_modo_operador(telefono_id)
+        
+        send_ia_message(
+            ESTADO_USUARIO="interesado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=lang,
+            prompt_type=prompt_type
+            )
+
+    elif mensaje_procesado == "btn_finalizar":
+        lang = "es"
+        prompt_type  = "prompt_ia_yes"
+
+        send_ia_message(
+            ESTADO_USUARIO="calificado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=lang,
+            prompt_type=prompt_type
+            )
+
     else:
         lang = "es"
         prompt_type  = "prompt_ia_yes"
@@ -880,16 +988,14 @@ def request1_messages(ESTADO_USUARIO, telefono_id, lang):
         message_response_for_list, 
         'list', 
         list_titles = ["🔄TicAll Flow®️Ecosys","🤖Custom AI Agents","🛒Ecommerce Arch",
-                       "⚡Performance Arch","📈Demand Generation","🌐High-Performance Webs",
-                       "🗣️Talk to an Agent"], # El titulo no debe superar 24 caracteres
-        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6","btn_0"],           # Pasamos los IDs fijos
+                       "⚡Performance Arch","📈Demand Generation","🌐High-Performance Webs"], # El titulo no debe superar 24 caracteres
+        list_ids = ["btn_1","btn_2","btn_3","btn_4","btn_5","btn_6"],           # Pasamos los IDs fijos
         list_descrip=["Growth Infrastructure Design",
                       "AI Agents & Automation",
                       "Scalable Commerce Hubs",
                       "ROI-Driven Architecture",
                       "Scalable Paid Media",
-                      "Scalable Web Systems",
-                      "Expert Human Assistance"] ,# la descripcion  no debe superar 72 caracteres
+                      "Scalable Web Systems"] ,# la descripcion  no debe superar 72 caracteres
         AGENTE_BOT = "Bot"
     )
 
