@@ -75,6 +75,7 @@ Actualiza 09/05/2026:
 - Ajuste en send_whatsapp_from_middleware para detectar media_url y media_type
 - Ajuste en send_message_and_log para enviar documentos e imagenes dinamicas por WhatsApp
 - Correccion de bloque 'image' duplicado en send_message_and_log
+- Agregado prefijo [🤖 Bot]: a mensajes del bot enviados a Zoho para diferenciacion del operador
 
 """
 #_______________________________________________________________________________________
@@ -633,6 +634,9 @@ def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
         logging.info(f"Mensaje de (ECO) ignorado...") 
         
     elif mensaje_para_zoho:
+        # Agregar prefijo para distinguir mensajes del bot en Zoho
+        if AGENTE_BOT == "Bot":
+            mensaje_para_zoho = f"[🤖 Bot]: {mensaje_para_zoho}"
         logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
         send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
     
