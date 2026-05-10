@@ -141,9 +141,8 @@ class Log(db.Model):
     agente = db.Column(db.Text)
 
 class UsuariosBot(db.Model):
-    id_bot = db.Column(db.Integer, primary_key=True)
+    telefono_usuario_id = db.Column(db.String(50), primary_key=True)
     lang = db.Column(db.Text)
-    telefono_usuario_id = db.Column(db.Text) #es el mismo whatsapp_id
     crm_contact_id = db.Column(db.Text)
     nombre_preferido = db.Column(db.Text)
     estado_usuario = db.Column(db.Text)
@@ -415,11 +414,14 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
 
         # 9. guardar en el log y enviar mensaje
 
+            
+
         if "Tu información está completa" in respuesta_bot:
             """
             Se marca en la BD Usuariosbot que la conversación terminó y el agente actual es IA
             """
             #9.1 actualizando BD
+            logging.info(f"send_ia_message: APAGADO DE BOT send_ia_message")
 
             usuario = UsuariosBot.query.filter_by(telefono_usuario_id =telefono_id).first()
             if usuario:
