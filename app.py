@@ -4,6 +4,9 @@ Dios bendiga este negocio y la properidad nos acompañe de la mano de Dios y su 
 """
 #_______________________________________________________________________________________
 #1. IMPORTS
+from flask import debughelpers
+from asyncio import exceptions
+from asyncio import exceptions
 from flask import Flask, request, json, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta #ayuda para el calculo de tiempo
@@ -141,11 +144,10 @@ class Log(db.Model):
     agente = db.Column(db.Text)
 
 class UsuariosBot(db.Model):
+    """Tabla de estados del Usuario y su interaccion con el Bot"""
+    __tablename__ ='usuarios_bot'
+
     telefono_usuario_id = db.Column(db.String(50), primary_key=True)
-    lang = db.Column(db.Text)
-    crm_contact_id = db.Column(db.Text)
-    nombre_preferido = db.Column(db.Text)
-    estado_usuario = db.Column(db.Text)
     fecha_y_hora = db.Column(db.DateTime, default=datetime.utcnow)
     chat_finalizado = db.Column(db.Boolean, default=False)
     agente_actual = db.Column(db.String(50), default="IA") #estados IA y Asesor
@@ -806,6 +808,23 @@ def recibir_mensajes(req):
                 ##envio a Zoho Sales IQ
 
                 send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
+
+                #Actualizando UsuariosBot
+                try:
+                    #verificar UsuariosBot
+                    visitor_db = db.session.get(UsuariosBot,telefono_id)
+                    if visitor_db:
+                        chat_estado = visitor_db.chat_finalizado
+                        logging.info(f"recibir_mensajes: Estado de CHAT IA: {chat_estado}")
+                    else:
+                        nuevo_visitante = UsuariosBot(telefono_usuario_id=telefono_id, chat_finalizado=False, agente_actual="IA")
+                        db.session.add(nuevo_visitante)
+                        db.session.commit()
+                        logging.info(f"recibir_mensajes: usuario ingresado en UsuariosBot: {telefono_id}")
+                except Exception as e:
+                    logging.error(f"recibir_mensajes: Error con DB: {e}")
+                    db.session.rollback()
+
 
                 #___________________________________________________________________________
 
