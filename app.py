@@ -11,6 +11,7 @@ from asyncio import exceptions
 from asyncio import exceptions
 from flask import Flask, request, json, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import select #consultas especificas mas rapidas a la BD
 from datetime import datetime, timedelta #ayuda para el calculo de tiempo
 import http.client
 import logging, requests
@@ -319,15 +320,21 @@ def gestion_modo_operador(telefono_id, nombre_agente='Asesor'):
         db.session.rollback()
         logging.error(f"gestion_modo_operador: Error en gestión de modo operador: {e}")
 
+"""
+def consulta_modo_operador(telefono_id):
+    usuario_db = db.session.get(UsuariosBot, telefono_id)
+    if usuario_db:
+        return usuario_db.agente_actual == "Asesor"
+    return False
+"""
 def consulta_modo_operador(telefono_id):
     """
     Consulta si un número está en modo operador.
     Retorna True si está en modo operador(Asesor), False en caso contrario(IA).
     """
-    usuario_db = db.session.get(UsuariosBot, telefono_id)
-    if usuario_db:
-        return usuario_db.agente_actual == "Asesor"
-    return False
+    usuario_db = select(UsuariosBot.agente_actual).filter_by(telefono_usuario_id=telefono_id)
+    agente = db.session.execute(usuario_db).scalar()
+    return agente == "Asesor"
 
 def finalizar_chat(telefono_id):
     try:
@@ -339,7 +346,7 @@ def finalizar_chat(telefono_id):
             usuario_db.chat_finalizado = True
         else:
             nuevo_usuario = UsuariosBot(
-                telefono_id = telefono_id,
+                telefono_usuario_id = telefono_id,
                 chat_finalizado = True,
                 agente_actual = 'IA'
             )
@@ -350,15 +357,22 @@ def finalizar_chat(telefono_id):
         db.session.rollback()
         logging.info(f"finalizar_chat: Error al Finalizar el chat: {e}")
 
+"""
+def consulta_chat_finalizado(telefono_id):
+    usuario_db = db.session.get(UsuariosBot, telefono_id)
+    if usuario_db:
+        return usuario_db.chat_finalizado == True
+    return False
+"""
 def consulta_chat_finalizado(telefono_id):
     """
     Consulta si un número ya habia finalizado un chat
     Retorna True si, si existe con una sesion finalizada, False en caso contrario
     """
-    usuario_db = db.session.get(UsuariosBot, telefono_id)
-    if usuario_db:
-        return usuario_db.chat_finalizado == True
-    return False
+    # Usamos select() para pedir SOLO el bit que necesitamos, evitando cargar todo el objeto UsuariosBot
+    usuario_db = select(UsuariosBot.chat_finalizado).filter_by(telefono_usuario_id=telefono_id)
+    # execute().scalar() es la vía directa al valor, saltando la creación de objetos de modelo
+    return db.session.execute(usuario_db).scalar() or False
 
 def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", prompt_type="prompt_ia_yes"):
     """Gestiona la conversacion con la IA usando persistencia en  BD"""
