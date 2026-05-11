@@ -4,6 +4,8 @@ Dios bendiga este negocio y la properidad nos acompañe de la mano de Dios y su 
 """
 #_______________________________________________________________________________________
 #1. IMPORTS
+from sqlalchemy.orm import _orm_constructors
+from asyncio import exceptions
 from flask import debughelpers
 from asyncio import exceptions
 from asyncio import exceptions
@@ -88,35 +90,7 @@ Actualiza 09/05/2026:
 AGENTE_BOT = "Bot" # Usamos una constante para el agente
 IMA_SALUDO_URL = os.getenv("IMA_SALUDO_URL")
 APP_B_URL = os.getenv("APP_B_URL")
-
-# --- Modo Operador: desconecta IA cuando agente humano toma control ---
-MODO_OPERADOR = {}
-MODO_OPERADOR_LOCK = Lock()
-TIEMPO_PAUSA_MINUTOS = 30
-
-def activar_modo_operador(telefono_id):
-    """Marca un número como en modo operador (IA pausada)."""
-    with MODO_OPERADOR_LOCK:
-        MODO_OPERADOR[telefono_id] = datetime.now()
-        logging.info(f"activar_modo_operador: [MODO OPERADOR] Activado para {telefono_id}")
-
-def desactivar_modo_operador(telefono_id):
-    """Reactiva el bot para un número."""
-    with MODO_OPERADOR_LOCK:
-        MODO_OPERADOR.pop(telefono_id, None)
-        logging.info(f"activar_modo_operador: [MODO OPERADOR] Desactivado para {telefono_id}")
-
-def esta_en_modo_operador(telefono_id):
-    """Verifica si un número está en modo operador (últimos N minutos)."""
-    with MODO_OPERADOR_LOCK:
-        if telefono_id in MODO_OPERADOR:
-            tiempo_pasado = datetime.now() - MODO_OPERADOR[telefono_id]
-            if tiempo_pasado < timedelta(minutes=TIEMPO_PAUSA_MINUTOS):
-                return True
-            else:
-                del MODO_OPERADOR[telefono_id]
-        return False
-
+#_______________________________________________________________________________________
 #_______________________________________________________________________________________
 #2. CONFIGURACIÓN DE LA APP
 # --- Funciones de la Aplicación Flask ---
@@ -313,14 +287,78 @@ class ConversationManager:
             db.session.rollback()
             logging.error(f"clear_old_histories: Erro9r limpiando historiales antiguos: {e}")
             return 0
-       
 #_______________________________________________________________________________________
 #5. INTANCIA GLOBAL DEL MANAGER
-
 conversation_manager = ConversationManager()
-
 #_______________________________________________________________________________________
 #6. FUNCIONES DE IA
+
+def gestion_modo_operador(telefono_id, nombre_agente='Asesor'):
+    """
+    Modo Operador: desconecta IA cuando agente humano toma control
+    Es llamadao para desactivar la IA cuando un agente humano toma el control de la conversacion
+    """
+    try:
+        #1. Revisar si existe el usuario, con el telefono
+        usuario_db = db.session.get(UsuariosBot, telefono_id)
+        if usuario_db:
+            #2.Si existe se actualiza el campo de agente_actual a asesor o IA
+            usuario_db.agente_actual = nombre_agente
+            usuario_db.chat_finalizado = False
+        else:
+            #Se crea el usuario con agente asesor o IA
+            nuevo_usuario = UsuariosBot(
+                telefono_usuario_id=telefono_id,
+                chat_finalizado = False,
+                agente_actual= nombre_agente                
+            )
+            db.session.add(nuevo_usuario)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"gestion_modo_operador: Error en gestión de modo operador: {e}")
+
+def consulta_modo_operador(telefono_id):
+    """
+    Consulta si un número está en modo operador.
+    Retorna True si está en modo operador(Asesor), False en caso contrario(IA).
+    """
+    usuario_db = db.session.get(UsuariosBot, telefono_id)
+    if usuario_db:
+        return usuario_db.agente_actual == "Asesor"
+    return False
+
+def finalizar_chat(telefono_id):
+    try:
+        #1.Consulta si existe el usuario
+        usuario_db = db.session.get(UsuariosBot, telefono_id)
+
+        if usuario_db:
+            #2.Si el usaario existe se actualizar el estado del chat a finalizado
+            usuario_db.chat_finalizado = True
+        else:
+            nuevo_usuario = UsuariosBot(
+                telefono_id = telefono_id,
+                chat_finalizado = True,
+                agente_actual = 'IA'
+            )
+            db.session.add(nuevo_usuario)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        logging.info(f"finalizar_chat: Error al Finalizar el chat: {e}")
+
+def consulta_chat_finalizado(telefono_id):
+    """
+    Consulta si un número ya habia finalizado un chat
+    Retorna True si, si existe con una sesion finalizada, False en caso contrario
+    """
+    usuario_db = db.session.get(UsuariosBot, telefono_id)
+    if usuario_db:
+        return usuario_db.chat_finalizado == True
+    return False
 
 def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", prompt_type="prompt_ia_yes"):
     """Gestiona la conversacion con la IA usando persistencia en  BD"""
@@ -420,16 +458,10 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
 
         if "Tu información está completa" in respuesta_bot:
             """
-            Se marca en la BD Usuariosbot que la conversación terminó y el agente actual es IA
+            En espera de accion por parte del usuario, para Contiuar con AI, Asesor o Finalizar la conversacion
             """
-            #9.1 actualizando BD
-            logging.info(f"send_ia_message: APAGADO DE BOT send_ia_message")
-
-            usuario = UsuariosBot.query.filter_by(telefono_usuario_id =telefono_id).first()
-            if usuario:
-                usuario.chat_finalizado = True
-                db.session.commit()
-            
+            #9.1 En espera de accion por parte del usuario
+            logging.info(f"send_ia_message: Información completa, en espera si continua con --Agente Humano-- o si --Finaliza la conversacion--")   
 
             #9.2 Se envia mensaje de confirmacion, es decir el resumen de los datos recopilados 
             send_message_and_log(
@@ -599,8 +631,6 @@ def cleanup_old_histories_endpoint():
         logging.error(f"Error en cleanup endpoint: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
-
 @app.route('/api/envio_whatsapp', methods=['POST'])
 def send_whatsapp_from_middleware():
     """
@@ -624,7 +654,7 @@ def send_whatsapp_from_middleware():
         
         # Si viene de un agente humano, activar modo operador para evitar que la IA intervenga
         if sender_role == "human_agent":
-            activar_modo_operador(telefono_id)
+            gestion_modo_operador(telefono_id, 'Asesor')
             logging.info(f"[ENVIO_WHATSAPP] Modo operador activado para {telefono_id} (mensaje de agente humano)")
 
         # Llama a tu función existente para enviar el mensaje
@@ -636,8 +666,12 @@ def send_whatsapp_from_middleware():
             msg_type = 'image' if 'image' in (media_type or '') else 'document'
         
         send_message_and_log(
-            ESTADO_USUARIO, telefono_id, message_text or '', msg_type,
-            media_url=media_url, AGENTE_BOT="Agente Humano"
+            ESTADO_USUARIO, 
+            telefono_id, 
+            message_text or '', 
+            msg_type,
+            media_url=media_url, 
+            AGENTE_BOT="Agente Humano"
         )
         
         return {"status": "ok", "message": "Mensaje enviado a WhatsApp"}, 200
@@ -666,11 +700,11 @@ def agregar_mensajes_log(datos_json):
 
 #___________________________________________________________________________
 #___________________________________________________________________________
-"""
-Analiza el payload de la API de whatsapp y extrae el texto principal,
-este solo se utili para extraer el mensaje generado por el bot
-"""
 def extraer_texto_para_zoho(data):
+    """
+    Analiza el payload de la API de whatsapp y extrae el texto principal,
+    este solo se utili para extraer el mensaje generado por el bot
+    """
     try:
         message_type = data.get("type")
         texto_extraido = ""
@@ -700,10 +734,10 @@ def extraer_texto_para_zoho(data):
         logging.error(f"extraer_texto_para_zoho: error extrayendo texto para zoho: {e}")
         return "[Error al procesar el mensaje para el bot]"
 
-"""
-Esta funcion registra primero en zoho y luego envia a whatsapp
-"""
 def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
+    """
+    Esta funcion registra primero en zoho y luego envia a whatsapp
+    """
     #1. Extrae el mensaje de humanos para zoho
     mensaje_para_zoho = extraer_texto_para_zoho(data)
 
@@ -721,11 +755,10 @@ def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
     #3. Envia mensaje del bot a whatsapp
     send_whatsapp_message(data)
 
-"""
-envio de mensajes a Zoho Sales IQ
-"""
-
 def send_zoho(telefono_id, mensaje_texto, tag):
+    """
+    envio de mensajes a Zoho Sales IQ
+    """
     payload = {
             "message": mensaje_texto,
             "user_id": telefono_id,
@@ -737,7 +770,6 @@ def send_zoho(telefono_id, mensaje_texto, tag):
         logging.info(f"✅ Reenviado a App B: {resp.status_code} {resp.text}")
     except Exception as e:
         logging.error(f"❌ Error reenviando a App B: {e}")  
-
 
 #_______________________________________________________________________________________
 #_______________________________________________________________________________________
@@ -805,33 +837,16 @@ def recibir_mensajes(req):
                 #chat_history = [{"role": "system", "content": mensaje_texto}]
                 AGENTE_BOT = "Usuario"
                 #___________________________________________________________________________
-                ##envio a Zoho Sales IQ
+                #=============ENVIO DE MENSAJES A ZOHO=============
 
                 send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
 
-                #Actualizando UsuariosBot
-                try:
-                    #verificar UsuariosBot
-                    visitor_db = db.session.get(UsuariosBot,telefono_id)
-                    if visitor_db:
-                        chat_estado = visitor_db.chat_finalizado
-                        logging.info(f"recibir_mensajes: Estado de CHAT IA: {chat_estado}")
-                    else:
-                        nuevo_visitante = UsuariosBot(telefono_usuario_id=telefono_id, chat_finalizado=False, agente_actual="IA")
-                        db.session.add(nuevo_visitante)
-                        db.session.commit()
-                        logging.info(f"recibir_mensajes: usuario ingresado en UsuariosBot: {telefono_id}")
-                except Exception as e:
-                    logging.error(f"recibir_mensajes: Error con DB: {e}")
-                    db.session.rollback()
-
-
-                #___________________________________________________________________________
-
-                if esta_en_modo_operador(telefono_id):
-                    logging.info(f"[MODO OPERADOR] IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
+                if consulta_modo_operador(telefono_id):
+                    logging.info(f"consulta_modo_operador: Asesor esta en linea y IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
                 else:
+                    #=============ENVIO DE MENSAJES A WHATSAPP=============
                     procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
+
             else:
                 logging.info("Mensaje no procesable (sin ID de teléfono o texto de mensaje).")
         
@@ -845,6 +860,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
     Procesa un mensaje recibido, determina el idioma del usuario y envía la respuesta adecuada.
     Registra el mensaje entrante y la respuesta en la base de datos y Google Sheets.
     """
+
     mensaje_procesado = mensaje_recibido.lower()
     lang = ""
     
@@ -919,14 +935,10 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
         prompt_type  = "prompt_ia_yes"
 
         #1. Actualizar estado del usuario a conectado
-        usuario = UsuariosBot.query.filter_by(telefono_usuario_id = telefono_id).first()
-        if usuario:
-            usuario.agente_actual = "Asesor"
-            db.session.commit()
-
-        #2. Activar modo operador
-        activar_modo_operador(telefono_id)
+        gestion_modo_operador(telefono_id, 'Asesor')
+        logging.info(f"gestion_modo_operador: IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
         
+        #2. Activar modo operador para desconectar IA y conectar asesor humano
         send_ia_message(
             ESTADO_USUARIO="interesado",
             telefono_id=telefono_id,
@@ -938,6 +950,9 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
     elif mensaje_procesado == "btn_finalizar":
         lang = "es"
         prompt_type  = "prompt_ia_yes"
+
+        finalizar_chat(telefono_id)
+        logging.info(f"finalizar_chat: Se Finaliza chat y vuelve a ser controlada por la IA para {telefono_id}. Mensaje solo reenviado a Zoho.")
 
         send_ia_message(
             ESTADO_USUARIO="calificado",
@@ -958,8 +973,6 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
-
-
 
 def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
     """Envía los mensajes iniciales (bienvenida, imagen, botones Si/No) después de seleccionar idioma."""
@@ -995,7 +1008,6 @@ def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
         button_ids=[si_id, no_id] ,# Pasamos los IDs fijos
         AGENTE_BOT = "Bot"
     )
-
 
 def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
@@ -1034,7 +1046,6 @@ def send_adviser_messages(ESTADO_USUARIO, telefono_id, mensaje_procesado, lang):
         lang=lang,
         prompt_type=prompt_type
         )
-
 
 def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type='text', button_titles=None, button_ids=None, list_titles=None, list_ids=None, list_descrip=None, AGENTE_BOT=None, media_url=None):
     """
