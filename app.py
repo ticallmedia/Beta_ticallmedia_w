@@ -919,15 +919,17 @@ def procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_recibido, AGENTE
             send_initial_messages(ESTADO_USUARIO, telefono_id, lang)     
         else:
             lang = "es"
-            prompt_type  = "restart_message"
+            #prompt_type  = "restart_message"
+            ESTADO_USUARIO = "antiguo"
+            send_initial_messagesReinicio(ESTADO_USUARIO, telefono_id, lang)     
 
-            send_ia_message(
+            """send_ia_message(
                 ESTADO_USUARIO="antiguo",
                 telefono_id=telefono_id,
                 message_text=mensaje_procesado,
                 lang=lang,
                 prompt_type=prompt_type
-                )
+                )"""
 
 
 def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
@@ -1085,6 +1087,15 @@ def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
         button_ids=[si_id, no_id] ,# Pasamos los IDs fijos
         AGENTE_BOT = "Bot"
     )
+
+def send_initial_messagesReinicio(ESTADO_USUARIO, telefono_id, lang):
+    """
+    Envía los mensajes de reinicio de conversación
+    """
+    # Saludo en el idioma elegido
+    message_response = get_message(lang, "restart_message")
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT = "Usuario")
+
 
 def request1_messages(ESTADO_USUARIO, telefono_id, lang):
     """El usuario esta interesado y desea conocer mas del tema"""
