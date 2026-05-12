@@ -907,6 +907,8 @@ def procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_recibido, AGENTE
 
     saludo_clave = ["hola","hi","hello","start","alo"]
 
+    logging.info(f"procesar_y_responder_mensajeFinalizado: Chat ya finalizado para {telefono_id}")
+
     if chat_finalizado:
         if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
             lang = "es"
