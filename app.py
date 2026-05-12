@@ -332,9 +332,31 @@ def consulta_modo_operador(telefono_id):
     Consulta si un número está en modo operador.
     Retorna True si está en modo operador(Asesor), False en caso contrario(IA).
     """
-    usuario_db = select(UsuariosBot.agente_actual).filter_by(telefono_usuario_id=telefono_id)
-    agente = db.session.execute(usuario_db).scalar()
-    return agente == "Asesor"
+    usuario_db = select(UsuariosBot.agente_actual, UsuariosBot.chat_finalizado).filter_by(telefono_usuario_id=telefono_id)
+    resultado = db.session.execute(usuario_db).first()
+
+    if resultado:
+        agente = (resultado.agente_actual == "Asesor")
+        chat_finalizado = resultado.chat_finalizado
+        return agente, chat_finalizado
+    
+    #Si no existe el usuario, se asume que no está en modo operador y el chat no está finalizado
+    return False, False
+
+def reinicia_chat(telefono_id):
+    try:
+        usuario_db = db.session.get(UsuariosBot, telefono_id)
+        
+        #Reactivando chat finalizado
+        
+        usuario_db.agente_actual = "IA"
+        usuario_db.chat_finalizado = False
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        logging.info(f"reinicia_chat: Error al reiniciar el chat: {e}")
+
 
 def finalizar_chat(telefono_id):
     try:
@@ -762,7 +784,7 @@ def enviar_respuesta_y_registrar_en_zoho(telefono_id, data, AGENTE_BOT):
     elif mensaje_para_zoho:
         # Agregar prefijo para distinguir mensajes del bot en Zoho
         if AGENTE_BOT == "Bot":
-            mensaje_para_zoho = f"═════════════ 🤖 TAM Bot ═════════════\n{mensaje_para_zoho}"
+            mensaje_para_zoho = f"[🤖 TAM Bot] ═══>:\n{mensaje_para_zoho}"
         logging.info(f"enviar_respuesta_y_registrar_en_zoho: '{mensaje_para_zoho}'")
         send_zoho(telefono_id, mensaje_para_zoho, "respuesta_bot")
     
@@ -855,7 +877,12 @@ def recibir_mensajes(req):
 
                 send_zoho(telefono_id, mensaje_texto, "soporte_urgente" )
 
-                if consulta_modo_operador(telefono_id):
+                modo_operador, chat_finalizado = consulta_modo_operador(telefono_id)
+
+                if chat_finalizado:
+                    logging.info(f"consulta_chat_finalizado: Chat ya finalizado para {telefono_id}. Mensaje solo reenviado a Zoho.")
+                    procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_texto, AGENTE_BOT,chat_finalizado)
+                elif modo_operador:
                     logging.info(f"consulta_modo_operador: Asesor esta en linea y IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
                 else:
                     #=============ENVIO DE MENSAJES A WHATSAPP=============
@@ -868,6 +895,38 @@ def recibir_mensajes(req):
     except Exception as e:
         logging.error(f"Error en recibir_mensajes: {e}")
         return jsonify({'message': 'EVENT_RECEIVED_ERROR'}), 500
+
+def procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_recibido, AGENTE_BOT, chat_finalizado):
+    """
+    Cuando el visitante ya tuvo una conversacion y finalizo el chat, si vuelve a escribir, 
+    sele  vuelve a responde con la IA, 
+    se le informa que el chat ya habia finalizado.
+    """
+    mensaje_procesado = mensaje_recibido.lower()
+    lang = ""
+
+    saludo_clave = ["hola","hi","hello","start","alo"]
+
+    if chat_finalizado:
+        if "hola" in mensaje_procesado  or any(palabra in mensaje_procesado for palabra in saludo_clave):
+            lang = "es"
+            
+            reinicia_chat(telefono_id)
+
+            ESTADO_USUARIO = "antiguo"
+            send_initial_messages(ESTADO_USUARIO, telefono_id, lang)     
+        else:
+            lang = "es"
+            prompt_type  = "restart_message"
+
+            send_ia_message(
+                ESTADO_USUARIO="antiguo",
+                telefono_id=telefono_id,
+                message_text=mensaje_procesado,
+                lang=lang,
+                prompt_type=prompt_type
+                )
+
 
 def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
     """
@@ -925,21 +984,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             lang=lang,
             prompt_type=prompt_type
             )
-    #_____________________________________
-    ##REVISAR LA FINALIZACION DEL CHAT
-    #_____________________________________
 
-    elif mensaje_procesado  in ["salir", "exit", "quit"]:
-        lang = "es"
-        prompt_type  = "prompt_ia_yes"
-
-        send_ia_message(
-            ESTADO_USUARIO="calificado",
-            telefono_id=telefono_id,
-            message_text=mensaje_procesado,
-            lang=lang,
-            prompt_type=prompt_type
-            )
     #_____________________________________
     ##REVISAR CONECTAR ASESOR Y FINALIZACION
     #_____________________________________
@@ -962,6 +1007,22 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             )
 
     elif mensaje_procesado == "btn_finalizar":
+        lang = "es"
+        prompt_type  = "prompt_ia_yes"
+
+        finalizar_chat(telefono_id)
+        logging.info(f"finalizar_chat: Se Finaliza chat y vuelve a ser controlada por la IA para {telefono_id}. Mensaje solo reenviado a Zoho.")
+
+        send_ia_message(
+            ESTADO_USUARIO="calificado",
+            telefono_id=telefono_id,
+            message_text=mensaje_procesado,
+            lang=lang,
+            prompt_type=prompt_type
+            )
+    
+    #finalizar con una palabra clave
+    elif mensaje_procesado  in ["salir", "exit", "quit"]:
         lang = "es"
         prompt_type  = "prompt_ia_yes"
 
