@@ -113,7 +113,7 @@ MESSAGES = {
         "list_footer_text":"Choose one of the options to let me help you 📌:",
         "list_button_text": "View Portfolio",
         "agent": "One moment, please. ⏳ We're connecting you with one of our advisors. We'll be with you shortly! 😊",
-        "restart_message": "Please type 'Hello' to start a new inquiry. 🤝"
+        "restart_message": "Please type 'Hello' to start a new inquiry. 🤝",
         "prompt_ia_yes": (
             "Hello! 👋 I'm TicAll Media's virtual assistant 😊. I'm here to help you request one of our digital services. "
             "I'll assist you with joy, respect, and plenty of emojis to make this experience more enjoyable 😄✨.\n\n"
@@ -208,7 +208,7 @@ MESSAGES = {
             "And if you don't want to continue for now, you can type 'finish' to close this chat without any problem ✅.\n\n"
             "I'm here to help you whenever you need. Thanks for visiting! 🙌"
         )
-    }
+    }    
 }
 
 def get_message(lang, key):
