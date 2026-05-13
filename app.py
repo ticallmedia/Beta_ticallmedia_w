@@ -881,10 +881,11 @@ def recibir_mensajes(req):
 
                 if chat_finalizado:
                     logging.info(f"consulta_chat_finalizado: Chat ya finalizado para {telefono_id}. Mensaje solo reenviado a Zoho.")
-                    procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_texto, AGENTE_BOT,chat_finalizado)
+                    procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_texto, AGENTE_BOT,chat_finalizado=True)
                 elif modo_operador:
                     logging.info(f"consulta_modo_operador: Asesor esta en linea y IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
-                    if mensaje_texto  in ["salir", "exit", "quit", "finalizar","btn_finalizar"]:
+                    mensaje_procesado = mensaje_texto.lower()
+                    if mensaje_procesado  in ["salir", "exit", "quit", "finalizar","btn_finalizar"]:
                         procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
 
                 else:
