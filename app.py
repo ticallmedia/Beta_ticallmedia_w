@@ -512,7 +512,7 @@ def send_ia_message(ESTADO_USUARIO, telefono_id, message_text, lang ="en", promp
             send_message_and_log(
                 ESTADO_USUARIO,
                 telefono_id,
-                '¿deseas continuar?',
+                '📲 Puedes hablar con un asesor en tiempo real o finalizar para ser contactado luego.',
                 'button',
                 button_titles = ["Hablar con un asesor","Finalizar"],
                 button_ids = ["btn_asesor", "btn_finalizar"],
@@ -919,9 +919,10 @@ def procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_recibido, AGENTE
             send_initial_messages(ESTADO_USUARIO, telefono_id, lang)     
         else:
             lang = "es"
-            #prompt_type  = "restart_message"
+            prompt_type  = "restart_message"
             ESTADO_USUARIO = "antiguo"
-            send_initial_messagesReinicio(ESTADO_USUARIO, telefono_id, lang)     
+            AGENTE_BOT = "Bot"
+            send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT)     
 
             """send_ia_message(
                 ESTADO_USUARIO="antiguo",
@@ -1012,34 +1013,42 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
 
     elif mensaje_procesado == "btn_finalizar":
         lang = "es"
-        prompt_type  = "prompt_ia_yes"
+        prompt_type  = "end_conversation"
+        ESTADO_USUARIO = "antiguo"
+        AGENTE_BOT = "Bot"
 
         finalizar_chat(telefono_id)
         logging.info(f"finalizar_chat: Se Finaliza chat y vuelve a ser controlada por la IA para {telefono_id}. Mensaje solo reenviado a Zoho.")
 
-        send_ia_message(
+        send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT)    
+
+        """send_ia_message(
             ESTADO_USUARIO="calificado",
             telefono_id=telefono_id,
             message_text=mensaje_procesado,
             lang=lang,
             prompt_type=prompt_type
-            )
+            )"""
     
     #finalizar con una palabra clave
     elif mensaje_procesado  in ["salir", "exit", "quit"]:
         lang = "es"
-        prompt_type  = "prompt_ia_yes"
+        prompt_type  = "end_conversation"
+        ESTADO_USUARIO = "antiguo"
+        AGENTE_BOT = "Bot"
 
         finalizar_chat(telefono_id)
         logging.info(f"finalizar_chat: Se Finaliza chat y vuelve a ser controlada por la IA para {telefono_id}. Mensaje solo reenviado a Zoho.")
 
-        send_ia_message(
+        send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT)    
+
+        """send_ia_message(
             ESTADO_USUARIO="calificado",
             telefono_id=telefono_id,
             message_text=mensaje_procesado,
             lang=lang,
             prompt_type=prompt_type
-            )
+            )"""
 
     else:
         lang = "es"
@@ -1088,13 +1097,16 @@ def send_initial_messages(ESTADO_USUARIO, telefono_id, lang):
         AGENTE_BOT = "Bot"
     )
 
-def send_initial_messagesReinicio(ESTADO_USUARIO, telefono_id, lang):
+def send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT):
     """
-    Envía los mensajes de reinicio de conversación
+    Envía los mensajes multiprosito sin IA 
+    - (cuando el usuario ya es antiguo o no se entiende el mensaje), 
+    para mantener la conversación activa y ofrecer opciones al usuario
+    - Para finalizar la conversación y enviar un mensaje de despedida
     """
     # Saludo en el idioma elegido
-    message_response = get_message(lang, "restart_message")
-    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT = "Usuario")
+    message_response = get_message(lang, prompt_type)
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT)
 
 
 def request1_messages(ESTADO_USUARIO, telefono_id, lang):
@@ -1171,7 +1183,7 @@ def send_message_and_log(ESTADO_USUARIO, telefono_id, message_text, message_type
             "interactive": {
                 "type": "button",
                 "body": {"text": message_text},
-                "footer": {"text": "Select one of the options:"},
+                "footer": {"text": " "},
                 "action": {"buttons": buttons}
             }
         }
