@@ -884,6 +884,9 @@ def recibir_mensajes(req):
                     procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_texto, AGENTE_BOT,chat_finalizado)
                 elif modo_operador:
                     logging.info(f"consulta_modo_operador: Asesor esta en linea y IA pausada para {telefono_id}. Mensaje solo reenviado a Zoho.")
+                    if mensaje_texto  in ["salir", "exit", "quit", "finalizar","btn_finalizar"]:
+                        procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
+
                 else:
                     #=============ENVIO DE MENSAJES A WHATSAPP=============
                     procesar_y_responder_mensaje(telefono_id, mensaje_texto, AGENTE_BOT)
@@ -1031,7 +1034,7 @@ def procesar_y_responder_mensaje(telefono_id, mensaje_recibido, AGENTE_BOT):
             )"""
     
     #finalizar con una palabra clave
-    elif mensaje_procesado  in ["salir", "exit", "quit"]:
+    elif mensaje_procesado  in ["salir", "exit", "quit", "finalizar"]:
         lang = "es"
         prompt_type  = "end_conversation"
         ESTADO_USUARIO = "antiguo"
