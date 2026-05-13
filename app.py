@@ -906,6 +906,11 @@ def procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_recibido, AGENTE
     sele  vuelve a responde con la IA, 
     se le informa que el chat ya habia finalizado.
     """
+
+    # Si el mensaje es None, se convierte en un string vacío para evitar errores al procesar el texto
+    if mensaje_recibido is None:
+        mensaje_recibido = ""
+        
     mensaje_procesado = mensaje_recibido.lower()
     lang = ""
 
