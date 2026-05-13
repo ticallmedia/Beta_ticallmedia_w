@@ -840,7 +840,7 @@ def recibir_mensajes(req):
 
         entry = data_json.get('entry', [{}])[0]
         changes = entry.get('changes', [{}])[0]
-        value = changes.get('value', {})
+        value = changes.get('value') or {}
         objeto_mensaje = value.get('messages', [])
 
 
