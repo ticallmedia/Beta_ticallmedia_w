@@ -17,7 +17,7 @@ import http.client
 import logging, requests
 import os
 from dotenv import load_dotenv
-import openai
+import openai # type: ignore
 from prompt_ia import get_message
 from io import StringIO # Importar StringIO para el manejo de credenciales
 import threading
@@ -191,8 +191,8 @@ class ConversationManager:
                     conversation.updated_at = datetime.utcnow()
                 else:
                     conversation = ConversationHistory(
-                        telefono_usuario_id = telefono_id,
-                        history = history
+                        telefono_usuario_id = telefono_id,# type: ignore
+                        history = history # type: ignore
                     )
                     db.session.add(conversation)
                 
@@ -309,9 +309,9 @@ def gestion_modo_operador(telefono_id, nombre_agente='Asesor'):
         else:
             #Se crea el usuario con agente asesor o IA
             nuevo_usuario = UsuariosBot(
-                telefono_usuario_id=telefono_id,
-                chat_finalizado = False,
-                agente_actual= nombre_agente                
+                telefono_usuario_id=telefono_id,# type: ignore
+                chat_finalizado = False,# type: ignore
+                agente_actual= nombre_agente # type: ignore      
             )
             db.session.add(nuevo_usuario)
         db.session.commit()
@@ -364,16 +364,21 @@ def finalizar_chat(telefono_id):
         usuario_db = db.session.get(UsuariosBot, telefono_id)
 
         if usuario_db:
-            #2.Si el usaario existe se actualizar el estado del chat a finalizado
+            #2.Si el usuario existe se actualizar el estado del chat a finalizado
             usuario_db.chat_finalizado = True
+            usuario_db.agente_actual = "IA"
         else:
             nuevo_usuario = UsuariosBot(
-                telefono_usuario_id = telefono_id,
-                chat_finalizado = True,
-                agente_actual = 'IA'
+                telefono_usuario_id = telefono_id,# type: ignore
+                chat_finalizado = True, # type: ignore
+                agente_actual = 'IA' # type: ignore
             )
             db.session.add(nuevo_usuario)
         db.session.commit()
+
+        #3.Limpiar memoria de OpenAI para ahorrar tokens y evitar errores de contexto
+        conversation_manager.clear_history(telefono_id)
+        #4.Eliminar cualquier mensaje pendiente en zo
 
     except Exception as e:
         db.session.rollback()
@@ -567,12 +572,12 @@ def _agregar_mensajes_log_thread_safe(log_data_json):
         try:
             datos = json.loads(log_data_json)
             nuevo_registro = Log(
-                telefono_usuario_id=datos.get('telefono_usuario_id'),
-                plataforma=datos.get('plataforma'),
-                mensaje=datos.get('mensaje'),
-                estado_usuario=datos.get('estado_usuario'),
-                etiqueta_campana=datos.get('etiqueta_campana'),
-                agente=datos.get('agente')
+                telefono_usuario_id=datos.get('telefono_usuario_id'), # type: ignore
+                plataforma=datos.get('plataforma'),# type: ignore
+                mensaje=datos.get('mensaje'),# type: ignore
+                estado_usuario=datos.get('estado_usuario'),# type: ignore
+                etiqueta_campana=datos.get('etiqueta_campana'),# type: ignore
+                agente=datos.get('agente')# type: ignore
             )
             db.session.add(nuevo_registro)
             db.session.commit()
@@ -879,6 +884,23 @@ def recibir_mensajes(req):
 
                 modo_operador, chat_finalizado = consulta_modo_operador(telefono_id)
 
+                #1. Evaluar si el usuario quiere salir (coincidencia exacta modo operador)
+                palabras_salir = ["salir", "adios", "terminar", "chao", "bye","finalizar", "cerrar"]
+                mensaje_procesado = mensaje_texto.lower()
+                quiere_salir = (mensaje_procesado ==  "btn_finalizar") or any(palabra in mensaje_procesado for palabra in palabras_salir)
+
+                if quiere_salir:
+                    logging.info(f"recibir_mensajes: Finlizando chat para telefono {telefono_id}")  
+                    finalizar_chat(telefono_id)                    
+                    return "OK", 200
+
+                    ESTADO_USUARIO = "antiguo"
+                    AGENTE_BOT = "Bot"
+                    lang = "es" 
+                    prompt_type = "end_conversation"
+                    
+                    send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT)     
+                
                 if chat_finalizado:
                     logging.info(f"consulta_chat_finalizado: Chat ya finalizado para {telefono_id}. Procesando respuesta para chat finalizado.")
                     procesar_y_responder_mensajeFinalizado(telefono_id, mensaje_texto, AGENTE_BOT, chat_finalizado=True)
