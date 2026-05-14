@@ -892,14 +892,14 @@ def recibir_mensajes(req):
                 if quiere_salir:
                     logging.info(f"recibir_mensajes: Finlizando chat para telefono {telefono_id}")  
                     finalizar_chat(telefono_id)                    
-                    return "OK", 200
 
                     ESTADO_USUARIO = "antiguo"
                     AGENTE_BOT = "Bot"
                     lang = "es" 
                     prompt_type = "end_conversation"
-                    
+
                     send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, AGENTE_BOT)     
+                    return "OK", 200
                 
                 if chat_finalizado:
                     logging.info(f"consulta_chat_finalizado: Chat ya finalizado para {telefono_id}. Procesando respuesta para chat finalizado.")
@@ -1133,7 +1133,7 @@ def send_multiproposito_sin_ia(ESTADO_USUARIO, telefono_id, lang, prompt_type, A
     """
     # Saludo en el idioma elegido
     message_response = get_message(lang, prompt_type)
-    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT)
+    send_message_and_log(ESTADO_USUARIO, telefono_id, message_response, 'text', AGENTE_BOT=AGENTE_BOT)
 
 
 def request1_messages(ESTADO_USUARIO, telefono_id, lang):
